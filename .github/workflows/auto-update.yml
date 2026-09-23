@@ -3,7 +3,13 @@ name: Fenix Auto Update & Build
 on:
   schedule:
     - cron: '0 3 1 * *' # Am 1. jedes Monats um 03:00 UTC
-  workflow_dispatch: # Manuell im GitHub Dashboard oder via CLI triggerbar
+  workflow_dispatch:
+    inputs:
+      force_build:
+        description: 'Erzwinge Build auch ohne neuen Upstream-Release'
+        required: false
+        type: boolean
+        default: true
 
 permissions:
   contents: write
