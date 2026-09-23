@@ -182,7 +182,15 @@ jobs:
         if: steps.upstream-check.outputs.should_build == 'true'
         id: package-apk
         run: |
-          APK=$(find mobile/android/fenix/app/build/outputs/apk -name "*.apk" | head -n 1)
+          echo "Suche nach erzeugten APKs..."
+          find . -name "*.apk"
+          APK=$(find . -path "*/outputs/apk/*" -name "*arm64-v8a*release*.apk" | head -n 1)
+          if [ -z "$APK" ]; then
+            APK=$(find . -path "*/outputs/apk/*" -name "*release*.apk" | grep -v "unaligned" | head -n 1)
+          fi
+          if [ -z "$APK" ]; then
+            APK=$(find . -path "*/outputs/apk/*" -name "*.apk" | grep -v "unaligned" | head -n 1)
+          fi
           if [ -z "$APK" ]; then
             echo "Fehler: Kein APK gefunden!"
             exit 1
