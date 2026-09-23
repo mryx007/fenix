@@ -252,6 +252,17 @@ logger.debug("mozconfig.gradle> topobjdir=${topobjdir}")
 
 def machEnvFile = new File(topobjdir, 'config.status.json')
 if (!machEnvFile.exists()) {
+    def fallbackRoot = new File(topsrcdir, 'config.status.json')
+    if (fallbackRoot.exists()) {
+        machEnvFile = fallbackRoot
+    } else {
+        def fallbackObjdir = new File(topsrcdir, 'objdir-android/config.status.json')
+        if (fallbackObjdir.exists()) {
+            machEnvFile = fallbackObjdir
+        }
+    }
+}
+if (!machEnvFile.exists()) {
     throw new GradleException("config.status.json not found at ${machEnvFile.absolutePath}. Run ./mach configure first.")
 }
 

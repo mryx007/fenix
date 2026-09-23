@@ -63,6 +63,48 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
+      - name: Configure Mozilla Mach Environment
+        run: |
+          VERSION=$(cat browser/config/version.txt | tr -d '\r\n')
+          echo "MOZ_APP_VERSION=$VERSION" >> $GITHUB_ENV
+          mkdir -p objdir-android obj-x86_64-pc-linux-gnu
+          cat << EOF > config.status.json
+          {
+            "topsrcdir": "$GITHUB_WORKSPACE",
+            "topobjdir": "$GITHUB_WORKSPACE/obj-x86_64-pc-linux-gnu",
+            "substs": {
+              "MOZ_BUILD_APP": "mobile/android",
+              "MOZ_APP_VERSION": "$VERSION",
+              "MOZ_UPDATE_CHANNEL": "release",
+              "MOZILLA_OFFICIAL": true,
+              "MOZ_ANDROID_FAT_AAR_ARCHITECTURES": ["arm64-v8a", "x86_64"],
+              "ANDROID_CPU_ARCH": "arm64-v8a",
+              "MOZ_ANDROID_GECKOVIEW_LITE": false,
+              "ANDROID_NDK_MAJOR_VERSION": "29",
+              "ANDROID_NDK_MINOR_VERSION": "0",
+              "ANDROID_BUILD_TOOLS_VERSION": "36.0.0",
+              "ANDROID_TARGET_SDK": "37",
+              "ANDROID_COMPILE_SDK_MAJOR": "37",
+              "ANDROID_COMPILE_SDK_MINOR": "1",
+              "MOZ_ANDROID_MIN_SDK_VERSION": "26",
+              "MOZ_APPSERVICES_IN_TREE": false,
+              "GRADLE_MAVEN_REPOSITORIES": [
+                "https://maven.mozilla.org/maven2/",
+                "https://plugins.gradle.org/m2/",
+                "https://maven.google.com/",
+                "https://repo.maven.apache.org/maven2/"
+              ],
+              "ALLOW_INSECURE_GRADLE_REPOSITORIES": false,
+              "MOZ_ANDROID_DEBUGGABLE": false,
+              "DOWNLOAD_ALL_GRADLE_DEPENDENCIES": false,
+              "MOZ_INCLUDE_SOURCE_INFO": false,
+              "MOZ_CRASHREPORTER": false
+            }
+          }
+          EOF
+          cp config.status.json objdir-android/config.status.json
+          cp config.status.json obj-x86_64-pc-linux-gnu/config.status.json
+
       - name: Decode Keystore
         run: |
           echo "${{ secrets.RELEASE_KEYSTORE_BASE64 }}" | base64 -d > mobile/android/fenix/fenix-release.keystore
@@ -81,7 +123,6 @@ jobs:
       - name: Find and Package APK
         id: package-apk
         run: |
-          # Finde generiertes Release-APK
           APK=$(find mobile/android/fenix/app/build/outputs/apk -name "*.apk" | head -n 1)
           if [ -z "$APK" ]; then
             echo "Fehler: Kein APK gefunden!"
@@ -89,7 +130,6 @@ jobs:
           fi
           echo "Gefundenes APK: $APK"
           
-          # Ziel-Dateiname
           DATE=$(date +'%Y.%m.%d')
           TARGET_APK="fenix-${DATE}.apk"
           cp "$APK" "$TARGET_APK"
@@ -104,4 +144,14 @@ jobs:
           APK="${{ steps.package-apk.outputs.apk_path }}"
           gh release create "$TAG" "$APK" \
             --title "Fenix Release $TAG" \
-            --notes "Automatischer monatlicher Fenix Build mit benutzerdefinierten Features: Tabs schliessen beim Wischen, Suche-Geste auf Homescreen, LeakCanary entfernt, Fenix Branding & fester Update-Schluessel."
+            --notes "Basiert auf Mozilla Firefox $MOZ_APP_VERSION"
+
+      - name: Cleanup Old Releases (Keep Last 3)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          OLD_RELEASES=$(gh release list --limit 100 --json tagName --jq '.[3:][].tagName')
+          for r in $OLD_RELEASES; do
+            echo "Entferne altes Release: $r"
+            gh release delete "$r" -y --cleanup-tag || true
+          done
