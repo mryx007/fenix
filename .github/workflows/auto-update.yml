@@ -83,7 +83,8 @@ jobs:
           mkdir -p objdir-android obj-x86_64-pc-linux-gnu
 
           python3 -m venv $GITHUB_WORKSPACE/objdir-android/_glean_venv
-          $GITHUB_WORKSPACE/objdir-android/_glean_venv/bin/pip install "glean_parser>=20.0"
+          $GITHUB_WORKSPACE/objdir-android/_glean_venv/bin/pip install "glean_parser~=20.0"
+          ln -sfn $GITHUB_WORKSPACE/objdir-android/_glean_venv $GITHUB_WORKSPACE/obj-x86_64-pc-linux-gnu/_glean_venv
 
           cat << EOF > config.status.json
           {
