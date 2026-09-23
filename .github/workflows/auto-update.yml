@@ -140,6 +140,26 @@ jobs:
           cp buildid.h objdir-android/buildid.h
           cp buildid.h obj-x86_64-pc-linux-gnu/buildid.h
 
+          # CrashReport.kt fuer lib-crash generieren
+          $GITHUB_WORKSPACE/objdir-android/_glean_venv/bin/python - << 'EOF'
+          import sys, os, io
+          sys.path.insert(0, 'toolkit/crashreporter/annotations')
+          import load, generate
+
+          val_yaml = io.StringIO()
+          load.main(val_yaml)
+          val_yaml.seek(0)
+          with open('validated.yaml', 'w') as f:
+              f.write(val_yaml.getvalue())
+
+          for obj in ['objdir-android', 'obj-x86_64-pc-linux-gnu']:
+              dest = f"{obj}/mobile/android/android-components/components/lib/crash/src/main/java/mozilla/components/lib/crash/service/CrashReport.kt"
+              os.makedirs(os.path.dirname(dest), exist_ok=True)
+              with open(dest, 'w') as f:
+                  generate.main(f, 'validated.yaml')
+              print(f"Generiert: {dest} ({os.path.getsize(dest)} Bytes)")
+          EOF
+
       - name: Decode Keystore
         if: steps.upstream-check.outputs.should_build == 'true'
         run: |
