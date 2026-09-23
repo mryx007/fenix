@@ -43,7 +43,7 @@ internal fun WordmarkLogo() {
                     resourceId = R.attr.fenixWordmarkLogo
                 }
                 .padding(end = 8.dp),
-        painter = painterResource(R.mipmap.ic_launcher_round),
+        painter = painterResource(R.drawable.fenix_logo),
         contentDescription = null,
     )
 }
