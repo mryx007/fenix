@@ -40,6 +40,7 @@ class HomeNavigationBar(
     @Composable
     private fun DefaultNavigationBarContent() {
         val uiState by toolbarStore.stateFlow.collectAsState()
+        val customNavbarVersion by org.mozilla.fenix.custom.CustomNavbarManager.version.collectAsState()
         val toolbarGravity =
             remember(settings) {
                 when (settings.shouldUseBottomToolbar) {
@@ -58,24 +59,31 @@ class HomeNavigationBar(
         val isPrivateMode = browsingModeManager.mode.isPrivate
 
         if (uiState.displayState.navigationActions.isNotEmpty() && !isKeyboardVisible) {
-            FirefoxTheme {
-                val colors = MaterialTheme.colorScheme
-                MaterialTheme(
-                    colorScheme =
-                        if (settings.enableUniversalEdgeToEdgeWallpapers && !isPrivateMode) {
-                            colors.copy(
-                                surface = Color.Transparent,
-                                onSurface = WallpaperTheme.onWallpaper,
-                            )
-                        } else {
-                            colors
-                        }
-                ) {
-                    NavigationBar(
-                        actions = uiState.displayState.navigationActions,
-                        toolbarGravity = toolbarGravity,
-                        onInteraction = { toolbarStore.dispatch(it) },
-                    )
+            val context = androidx.compose.ui.platform.LocalContext.current
+            val customActions = org.mozilla.fenix.custom.CustomNavbarManager.applyCustomizations(
+                context = context,
+                actions = uiState.displayState.navigationActions,
+            )
+            if (customActions.isNotEmpty()) {
+                FirefoxTheme {
+                    val colors = MaterialTheme.colorScheme
+                    MaterialTheme(
+                        colorScheme =
+                            if (settings.enableUniversalEdgeToEdgeWallpapers && !isPrivateMode) {
+                                colors.copy(
+                                    surface = Color.Transparent,
+                                    onSurface = WallpaperTheme.onWallpaper,
+                                )
+                            } else {
+                                colors
+                            }
+                    ) {
+                        NavigationBar(
+                            actions = customActions,
+                            toolbarGravity = toolbarGravity,
+                            onInteraction = { toolbarStore.dispatch(it) },
+                        )
+                    }
                 }
             }
         }

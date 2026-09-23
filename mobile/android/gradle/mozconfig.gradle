@@ -82,6 +82,11 @@ abstract class TopobjdirValueSource implements ValueSource<String, TopobjdirValu
 
         // Check local cache (this doesn't affect Gradle's config cache since we're inside obtain())
         // Disable local caching in automation to ensure consistent behavior
+        def standaloneObjdir = new File(topsrcdir, "objdir-android")
+        if (new File(standaloneObjdir, "config.status.json").exists()) {
+            return standaloneObjdir.absolutePath
+        }
+
         def useCache = !parameters.mozAutomation.get()
 
         def cacheDir = new File(topsrcdir, ".gradle/mach-environment-cache")

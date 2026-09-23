@@ -97,6 +97,61 @@
         app:iconSpaceReserved="false" />
 
     <androidx.preference.PreferenceCategory
+        android:key="pref_key_custom_navbar_category"
+        android:layout="@layout/preference_cat_style"
+        android:title="Navigationsleiste"
+        app:iconSpaceReserved="false">
+        <androidx.preference.SwitchPreferenceCompat
+            android:key="pref_key_navbar_back"
+            android:title="Zurück"
+            android:icon="@drawable/mozac_ic_back_24"
+            app:icon="@drawable/mozac_ic_back_24"
+            android:defaultValue="true" />
+        <androidx.preference.SwitchPreferenceCompat
+            android:key="pref_key_navbar_forward"
+            android:title="Vorwärts"
+            android:icon="@drawable/mozac_ic_forward_24"
+            app:icon="@drawable/mozac_ic_forward_24"
+            android:defaultValue="true" />
+        <androidx.preference.SwitchPreferenceCompat
+            android:key="pref_key_navbar_home"
+            android:title="Startseite"
+            android:icon="@drawable/mozac_ic_home_24"
+            app:icon="@drawable/mozac_ic_home_24"
+            android:defaultValue="true" />
+        <androidx.preference.SwitchPreferenceCompat
+            android:key="pref_key_navbar_new_tab"
+            android:title="Neuer Tab"
+            android:icon="@drawable/mozac_ic_plus_24"
+            app:icon="@drawable/mozac_ic_plus_24"
+            android:defaultValue="true" />
+        <androidx.preference.SwitchPreferenceCompat
+            android:key="pref_key_navbar_tab_counter"
+            android:title="Tab-Übersicht"
+            android:icon="@drawable/mozac_ic_tab_tray_24"
+            app:icon="@drawable/mozac_ic_tab_tray_24"
+            android:defaultValue="true" />
+        <androidx.preference.SwitchPreferenceCompat
+            android:key="pref_key_navbar_menu"
+            android:title="Menü"
+            android:icon="@drawable/mozac_ic_ellipsis_vertical_24"
+            app:icon="@drawable/mozac_ic_ellipsis_vertical_24"
+            android:defaultValue="true" />
+        <androidx.preference.SwitchPreferenceCompat
+            android:key="pref_key_navbar_share"
+            android:title="Teilen"
+            android:icon="@drawable/mozac_ic_share_android_24"
+            app:icon="@drawable/mozac_ic_share_android_24"
+            android:defaultValue="false" />
+        <androidx.preference.SwitchPreferenceCompat
+            android:key="pref_key_navbar_bookmark"
+            android:title="Lesezeichen"
+            android:icon="@drawable/mozac_ic_bookmark_24"
+            app:icon="@drawable/mozac_ic_bookmark_24"
+            android:defaultValue="false" />
+    </androidx.preference.PreferenceCategory>
+
+    <androidx.preference.PreferenceCategory
         android:layout="@layout/preference_cat_style"
         android:title="@string/preferences_gestures"
         app:iconSpaceReserved="false">

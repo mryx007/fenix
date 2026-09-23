@@ -475,6 +475,11 @@ open class HomeActivity : LocaleAwareAppCompatActivity(), NavHostActivity, Crash
         // Checks if Activity is currently in PiP mode if launched from external intents, then exits it
         checkAndExitPiP()
 
+        try {
+            startService(android.content.Intent(this, org.mozilla.fenix.custom.AppCloseCleanupService::class.java))
+        } catch (_: Throwable) {
+        }
+
         // Diagnostic breadcrumb for "Display already aquired" crash:
         // https://github.com/mozilla-mobile/android-components/issues/7960
         breadcrumb(

@@ -216,6 +216,7 @@ internal fun InlineAutocompleteTextField(
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
+        keyboardController?.show()
     }
 
     LaunchedEffect(query) {

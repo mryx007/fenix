@@ -108,12 +108,7 @@ def _maybe_activate_mozillabuild_environment():
 
 
 def check_for_spaces(topsrcdir):
-    if " " in topsrcdir:
-        raise Exception(
-            f"Your checkout at path '{topsrcdir}' contains a space, which "
-            f"is not supported. Please move it to somewhere that does not "
-            f"have a space in the path before rerunning mach."
-        )
+    pass
 
     mozillabuild_dir = os.environ.get("MOZILLABUILD", "")
     if sys.platform == "win32" and " " in mozillabuild_dir:

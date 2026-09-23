@@ -403,26 +403,31 @@ class BrowserToolbarMiddleware(
     private suspend fun buildNavigationActions(): List<Action> {
         val isWideWindow = isWideScreen()
         val isTallWindow = isTallScreen()
-        val shouldUseExpandedToolbar = settings.shouldUseExpandedToolbar
-        val primarySlotAction =
-            ShortcutType.fromValue(settings.toolbarExpandedShortcutKey)?.toHomeToolbarAction()
-                ?: HomeToolbarAction.FakeBookmark
 
         return listOf(
-                HomeToolbarActionConfig(primarySlotAction) {
-                    shouldUseExpandedToolbar && isTallWindow && !isWideWindow
+                HomeToolbarActionConfig(HomeToolbarAction.FakeBack) {
+                    isTallWindow && !isWideWindow
                 },
-                HomeToolbarActionConfig(HomeToolbarAction.FakeShare) {
-                    shouldUseExpandedToolbar && isTallWindow && !isWideWindow
+                HomeToolbarActionConfig(HomeToolbarAction.FakeForward) {
+                    isTallWindow && !isWideWindow
+                },
+                HomeToolbarActionConfig(HomeToolbarAction.FakeHomepage) {
+                    isTallWindow && !isWideWindow
                 },
                 HomeToolbarActionConfig(HomeToolbarAction.NewTab) {
-                    shouldUseExpandedToolbar && isTallWindow && !isWideWindow
+                    isTallWindow && !isWideWindow
+                },
+                HomeToolbarActionConfig(HomeToolbarAction.FakeBookmark) {
+                    isTallWindow && !isWideWindow
+                },
+                HomeToolbarActionConfig(HomeToolbarAction.FakeShare) {
+                    isTallWindow && !isWideWindow
                 },
                 HomeToolbarActionConfig(HomeToolbarAction.TabCounter) {
-                    shouldUseExpandedToolbar && isTallWindow && !isWideWindow
+                    isTallWindow && !isWideWindow
                 },
                 HomeToolbarActionConfig(HomeToolbarAction.Menu) {
-                    shouldUseExpandedToolbar && isTallWindow && !isWideWindow
+                    isTallWindow && !isWideWindow
                 },
             )
             .filter { config ->
@@ -526,6 +531,7 @@ class BrowserToolbarMiddleware(
         FakeTranslate,
         FakeHomepage,
         FakeBack,
+        FakeForward,
         FakeSummarize,
     }
 
@@ -626,6 +632,14 @@ class BrowserToolbarMiddleware(
                 ActionButtonRes(
                     drawableResId = iconsR.drawable.mozac_ic_back_24,
                     contentDescription = R.string.browser_menu_back,
+                    state = ActionButton.State.DISABLED,
+                    onClick = FakeClicked,
+                )
+
+            HomeToolbarAction.FakeForward ->
+                ActionButtonRes(
+                    drawableResId = iconsR.drawable.mozac_ic_forward_24,
+                    contentDescription = R.string.browser_menu_forward,
                     state = ActionButton.State.DISABLED,
                     onClick = FakeClicked,
                 )

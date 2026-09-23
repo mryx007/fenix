@@ -863,18 +863,19 @@ class BrowserToolbarMiddleware(
     private suspend fun buildNavigationActions(): List<Action> {
         val isWideWindow = isWideScreen()
         val isTallWindow = isTallScreen()
-        val shouldUseExpandedToolbar = settings.shouldUseExpandedToolbar
-        val primarySlotAction =
-            ShortcutType.fromValue(settings.toolbarExpandedShortcutKey)?.toToolbarAction(false) ?: getBookmarkAction()
+        val bookmarkAction = getBookmarkAction()
 
         return listOf(
-                ToolbarActionConfig(primarySlotAction) { shouldUseExpandedToolbar && isTallWindow && !isWideWindow },
-                ToolbarActionConfig(ToolbarAction.Share) { shouldUseExpandedToolbar && isTallWindow && !isWideWindow },
-                ToolbarActionConfig(ToolbarAction.NewTab) { shouldUseExpandedToolbar && isTallWindow && !isWideWindow },
+                ToolbarActionConfig(ToolbarAction.Back) { isTallWindow && !isWideWindow },
+                ToolbarActionConfig(ToolbarAction.Forward) { isTallWindow && !isWideWindow },
+                ToolbarActionConfig(ToolbarAction.Homepage) { isTallWindow && !isWideWindow },
+                ToolbarActionConfig(ToolbarAction.NewTab) { isTallWindow && !isWideWindow },
+                ToolbarActionConfig(bookmarkAction) { isTallWindow && !isWideWindow },
+                ToolbarActionConfig(ToolbarAction.Share) { isTallWindow && !isWideWindow },
                 ToolbarActionConfig(ToolbarAction.TabCounter) {
-                    shouldUseExpandedToolbar && isTallWindow && !isWideWindow
+                    isTallWindow && !isWideWindow
                 },
-                ToolbarActionConfig(ToolbarAction.Menu) { shouldUseExpandedToolbar && isTallWindow && !isWideWindow },
+                ToolbarActionConfig(ToolbarAction.Menu) { isTallWindow && !isWideWindow },
             )
             .filter { config ->
                 config.isVisible()

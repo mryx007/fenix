@@ -425,3 +425,15 @@ CLAUDE.local.md
 # Ignore .json.gz (typically profiles) in the root directory
 # lint-ignore-next-line: git-only
 /*.json.gz
+
+# Keystores
+*.keystore
+*.jks
+
+# Tooling and Assistant Files
+.agents/
+.claude/
+.gemini/
+.opencode/
+opencode.json
+GEMINI.md

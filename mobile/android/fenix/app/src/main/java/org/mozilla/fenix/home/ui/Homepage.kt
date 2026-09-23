@@ -28,9 +28,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
@@ -54,6 +60,7 @@ import org.mozilla.fenix.GleanMetrics.RecentlyVisitedHomepage
 import org.mozilla.fenix.R
 import org.mozilla.fenix.browser.browsingmode.BrowsingMode
 import org.mozilla.fenix.components.appstate.AppAction
+import org.mozilla.fenix.components.appstate.AppAction.SearchAction.SearchStarted
 import org.mozilla.fenix.components.appstate.AppAction.ShortcutAction
 import org.mozilla.fenix.components.appstate.setup.checklist.SetupChecklistState
 import org.mozilla.fenix.components.components
@@ -135,7 +142,50 @@ internal fun Homepage(
     val browsingModeChanged = interactor::onPrivateModeButtonClicked
     var shortcutsDialogState by remember { mutableStateOf<DialogState>(DialogState.Closed) }
 
-    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
+    val context = LocalContext.current
+    val swipeThreshold = with(LocalDensity.current) { 50.dp.toPx() }
+    val swipeDownConnection = remember {
+        object : NestedScrollConnection {
+            private var totalDownwardDrag = 0f
+
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                if (!state.isSearchInProgress && source == NestedScrollSource.UserInput && available.y > 0f) {
+                    totalDownwardDrag += available.y
+                    if (totalDownwardDrag > swipeThreshold) {
+                        totalDownwardDrag = 0f
+                        context.components.appStore.dispatch(SearchStarted())
+                        return Offset(0f, available.y)
+                    }
+                } else if (available.y < 0f) {
+                    totalDownwardDrag = 0f
+                }
+                return Offset.Zero
+            }
+
+            override fun onPostScroll(
+                consumed: Offset,
+                available: Offset,
+                source: NestedScrollSource,
+            ): Offset {
+                if (available.y < 0f) {
+                    totalDownwardDrag = 0f
+                }
+                return Offset.Zero
+            }
+
+            override suspend fun onPreFling(available: Velocity): Velocity {
+                totalDownwardDrag = 0f
+                return Velocity.Zero
+            }
+
+            override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+                totalDownwardDrag = 0f
+                return Velocity.Zero
+            }
+        }
+    }
+
+    BoxWithConstraints(modifier = modifier.fillMaxSize().nestedScroll(swipeDownConnection)) {
         Column(
             modifier =
                 Modifier.fillMaxSize()

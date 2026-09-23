@@ -905,6 +905,11 @@
             <action android:name="org.mozilla.fenix.NIMBUS_TOOLING" />
           </intent-filter>
         </receiver>
+
+        <service
+            android:name="org.mozilla.fenix.custom.AppCloseCleanupService"
+            android:exported="false"
+            android:stopWithTask="false" />
     </application>
 
 </manifest>

@@ -1,0 +1,106 @@
+name: Fenix Auto Update & Build
+
+on:
+  schedule:
+    - cron: '0 3 1 * *' # Am 1. jedes Monats um 03:00 UTC
+  workflow_dispatch: # Manuell im GitHub Dashboard oder via CLI triggerbar
+
+permissions:
+  contents: write
+
+jobs:
+  update-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Git Config
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Check and Merge Upstream Mozilla Releases
+        id: upstream-check
+        run: |
+          git remote add upstream https://github.com/mozilla-firefox/firefox.git || true
+          git fetch upstream --tags
+
+          # Neuesten stabilen FIREFOX-ANDROID Release-Tag finden (ohne Beta 'b', Alpha 'a')
+          LATEST_TAG=$(git tag -l "FIREFOX-ANDROID_*_RELEASE" | grep -v "[0-9]b" | sort -V | tail -n 1)
+          echo "Neuester Upstream Release Tag: $LATEST_TAG"
+
+          if [ -n "$LATEST_TAG" ]; then
+            if ! git merge-base --is-ancestor "$LATEST_TAG" HEAD; then
+              echo "Neuerer Upstream-Release gefunden: $LATEST_TAG. Versuche automatischen Merge..."
+              if git merge "$LATEST_TAG" -m "chore: merge upstream release $LATEST_TAG"; then
+                echo "Merge erfolgreich."
+                git push origin HEAD || true
+              else
+                echo "Konflikt beim Upstream-Merge! Breche Merge ab und baue aktuellen Stand..."
+                git merge --abort || true
+              fi
+            else
+              echo "Branch ist bereits auf dem Stand von $LATEST_TAG oder neuer."
+            fi
+          fi
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Decode Keystore
+        run: |
+          echo "${{ secrets.RELEASE_KEYSTORE_BASE64 }}" | base64 -d > mobile/android/fenix/fenix-release.keystore
+
+      - name: Build Fenix APK
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          cd mobile/android/fenix
+          chmod +x gradlew
+          export KEYSTORE_FILE="$PWD/fenix-release.keystore"
+          ./gradlew :app:assembleRelease -PdisableOptimization
+
+      - name: Find and Package APK
+        id: package-apk
+        run: |
+          # Finde generiertes Release-APK
+          APK=$(find mobile/android/fenix/app/build/outputs/apk -name "*.apk" | head -n 1)
+          if [ -z "$APK" ]; then
+            echo "Fehler: Kein APK gefunden!"
+            exit 1
+          fi
+          echo "Gefundenes APK: $APK"
+          
+          # Ziel-Dateiname
+          DATE=$(date +'%Y.%m.%d')
+          TARGET_APK="fenix-${DATE}.apk"
+          cp "$APK" "$TARGET_APK"
+          echo "apk_path=$TARGET_APK" >> $GITHUB_OUTPUT
+          echo "release_tag=v${DATE}" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ steps.package-apk.outputs.release_tag }}"
+          APK="${{ steps.package-apk.outputs.apk_path }}"
+          gh release create "$TAG" "$APK" \
+            --title "Fenix Release $TAG" \
+            --notes "Automatischer monatlicher Fenix Build mit benutzerdefinierten Features:
+- Tabs schließen beim Wischen (Close on swipe)
+- Suchleiste per Wischgeste auf Homescreen
+- LeakCanary entfernt
+- Neues Fenix Branding & Icon
+- Fester Release-Schlüssel für nahtlose Updates"

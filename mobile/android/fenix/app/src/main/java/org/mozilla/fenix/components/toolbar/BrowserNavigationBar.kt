@@ -79,6 +79,7 @@ class BrowserNavigationBar(
     @Composable
     private fun DefaultNavigationBarContent() {
         val uiState by toolbarStore.stateFlow.collectAsState()
+        val customNavbarVersion by org.mozilla.fenix.custom.CustomNavbarManager.version.collectAsState()
         val toolbarGravity =
             remember(settings) {
                 when (settings.shouldUseBottomToolbar) {
@@ -95,12 +96,18 @@ class BrowserNavigationBar(
             }
 
         if (uiState.displayState.navigationActions.isNotEmpty() && !isKeyboardVisible) {
-            FirefoxTheme {
-                NavigationBar(
-                    actions = uiState.displayState.navigationActions,
-                    toolbarGravity = toolbarGravity,
-                    onInteraction = { toolbarStore.dispatch(it) },
-                )
+            val customActions = org.mozilla.fenix.custom.CustomNavbarManager.applyCustomizations(
+                context = context,
+                actions = uiState.displayState.navigationActions,
+            )
+            if (customActions.isNotEmpty()) {
+                FirefoxTheme {
+                    NavigationBar(
+                        actions = customActions,
+                        toolbarGravity = toolbarGravity,
+                        onInteraction = { toolbarStore.dispatch(it) },
+                    )
+                }
             }
         }
     }

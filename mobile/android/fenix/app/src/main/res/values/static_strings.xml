@@ -4,8 +4,12 @@
    - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Name of the application -->
-    <string name="app_name" translatable="false">Firefox Fenix</string>
+    <string name="app_name" translatable="false">Fenix</string>
     <string name="firefox" translatable="false">Firefox</string>
+
+    <string name="pref_key_check_updates" translatable="false">pref_key_check_updates</string>
+    <string name="preferences_check_updates" translatable="false">Nach Updates suchen</string>
+    <string name="preferences_check_updates_summary" translatable="false">Prüft auf GitHub nach neuen Fenix Releases</string>
 
     <!-- Preference for developers -->
     <string name="preference_leakcanary" translatable="false">LeakCanary</string>

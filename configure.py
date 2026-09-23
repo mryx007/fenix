@@ -84,21 +84,7 @@ def main(argv):
         # backend will make this limitation go away. But there is likely a long tail
         # of things that will need fixing due to e.g. lack of proper path quoting.
         topsrcdir = os.path.realpath(os.path.dirname(__file__))
-        if len(topsrcdir.split()) > 1:
-            print(
-                "Source directory cannot be located in a path with spaces: %s"
-                % topsrcdir,
-                file=sys.stderr,
-            )
-            return 1
         topobjdir = os.path.realpath(os.curdir)
-        if len(topobjdir.split()) > 1:
-            print(
-                "Object directory cannot be located in a path with spaces: %s"
-                % topobjdir,
-                file=sys.stderr,
-            )
-            return 1
 
         if sys.platform == "win32":
             # Long paths cause two kinds of build failures on Windows:

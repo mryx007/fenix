@@ -575,6 +575,11 @@ class SettingsFragment : PreferenceFragmentCompat(), SystemInsetsPaddedFragment 
                     null
                 }
 
+                resources.getString(R.string.pref_key_check_updates) -> {
+                    org.mozilla.fenix.custom.FenixUpdater.checkForUpdates(requireActivity())
+                    null
+                }
+
                 resources.getString(R.string.pref_key_about) -> {
                     SettingsFragmentDirections.actionSettingsFragmentToAboutFragment()
                 }

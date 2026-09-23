@@ -1630,7 +1630,7 @@ class Settings(
     var shouldUseExpandedToolbar by
         booleanPreference(
             key = appContext.getPreferenceKey(R.string.pref_key_toolbar_expanded),
-            default = { FxNimbus.features.defaultExpandedToolbar.value().enabled },
+            default = { true },
             persistDefaultIfNotExists = true,
         )
 

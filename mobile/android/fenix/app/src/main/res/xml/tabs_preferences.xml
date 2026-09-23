@@ -44,6 +44,11 @@
             android:defaultValue="false"
             android:key="@string/pref_key_close_tabs_after_one_month"
             android:title="@string/close_tabs_after_one_month" />
+
+        <androidx.preference.SwitchPreferenceCompat
+            android:key="pref_key_close_tabs_on_task_removed"
+            android:title="Schließt alle Tabs beim Wegwischen"
+            android:defaultValue="true" />
     </androidx.preference.PreferenceCategory>
 
     <androidx.preference.PreferenceCategory

@@ -76,6 +76,22 @@ android {
         buildConfigField "boolean", "IS_BENCHMARK_BUILD", "false"
     }
 
+    signingConfigs {
+        fenixRelease {
+            def keystorePath = System.getenv("KEYSTORE_FILE") ?: "${project.rootDir}/fenix-release.keystore"
+            def keystoreFile = file(keystorePath)
+            if (!keystoreFile.exists()) {
+                keystoreFile = file("${projectDir}/../fenix-release.keystore")
+            }
+            if (keystoreFile.exists()) {
+                storeFile keystoreFile
+                storePassword System.getenv("KEYSTORE_PASSWORD") ?: "fenixandroidrelease"
+                keyAlias System.getenv("KEY_ALIAS") ?: "fenix"
+                keyPassword System.getenv("KEY_PASSWORD") ?: "fenixandroidrelease"
+            }
+        }
+    }
+
     def releaseTemplate = {
         // We allow disabling optimization by passing `-PdisableOptimization` to gradle. This is used
         // in automation for UI testing non-debug builds.
@@ -92,7 +108,9 @@ android {
 	    // If building locally, just use debug signing. In official automation builds, the
 	    // files are signed using a separate service and not within gradle.
 	    // Also skip during buildconfig linting, and skip if the `disableDebugSigning` Gradle property is set.
-        if (!project.hasProperty("disableDebugSigning") && !gradle.hasProperty("localProperties.disableDebugSigning") && !gradle.mozconfig.substs.MOZ_AUTOMATION && System.getenv("MOZ_BUILD_CONFIG_LINT") != "1") {
+        if (signingConfigs.fenixRelease.storeFile?.exists()) {
+            signingConfig = signingConfigs.fenixRelease
+        } else if (!project.hasProperty("disableDebugSigning") && !gradle.hasProperty("localProperties.disableDebugSigning") && !gradle.mozconfig.substs.MOZ_AUTOMATION && System.getenv("MOZ_BUILD_CONFIG_LINT") != "1") {
             signingConfig = signingConfigs.debug
         }
 
@@ -104,6 +122,9 @@ android {
 
     buildTypes {
         debug {
+            if (signingConfigs.fenixRelease.storeFile?.exists()) {
+                signingConfig = signingConfigs.fenixRelease
+            }
             shrinkResources = false
             minifyEnabled = false
             applicationIdSuffix ".fenix.debug"
@@ -218,21 +239,7 @@ android {
 
     splits {
         abi {
-            enable = !isAppBundle
-
-            reset()
-
-            // As gradle is unable to pick the right apk to install when multiple apks are generated
-            // while running benchmark tests or generating baseline profiles. To circumvent this,
-            // this flag is passed to make sure only one apk is generated so gradle can pick that one.
-            if (project.hasProperty("benchmarkTest")) {
-                include "arm64-v8a"
-            } else {
-                include "armeabi-v7a", "arm64-v8a", "x86_64"
-                if (gradle.mozconfig.substs.MOZILLA_OFFICIAL || System.getenv("MOZ_BUILD_CONFIG_LINT") == "1") {
-                    universalApk true
-                }
-            }
+            enable = false
         }
     }
 
@@ -401,11 +408,7 @@ android.buildTypes.debug.with {
         buildConfigField 'String', 'NIMBUS_ENDPOINT', 'null'
     }
 
-    if (project.hasProperty("disableLeakCanary") || gradle.hasProperty("localProperties.disableLeakCanary")) {
-        buildConfigField "boolean", "LEAKCANARY", "false"
-    } else {
-        buildConfigField "boolean", "LEAKCANARY", "true"
-    }
+    buildConfigField "boolean", "LEAKCANARY", "false"
 
     // Read `secretSettings.*` entries from local.properties and pass them to the app.
     def secretSettingsPrefix = "localProperties.secretSettings."
@@ -615,7 +618,6 @@ dependencies {
     ksp libs.androidx.room.compiler
 
     debugImplementation libs.androidx.compose.ui.tooling
-    debugImplementation libs.leakcanary
 
     // Exclude Mockito to prevent classpath conflicts with MockK in tests.
     testImplementation (project(':components:support-test')) {
