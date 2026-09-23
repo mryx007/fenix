@@ -30,19 +30,17 @@ object FenixUpdater {
     private const val CHECK_INTERVAL_MS = 4 * 60 * 60 * 1000L // alle 4 Stunden im Hintergrund prüfen
 
     fun checkForUpdatesSilently(activity: Activity) {
-        val prefs = activity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        val lastCheck = prefs.getLong(KEY_LAST_CHECK, 0L)
-        val now = System.currentTimeMillis()
-        if (now - lastCheck < CHECK_INTERVAL_MS) {
-            return
-        }
-        prefs.edit().putLong(KEY_LAST_CHECK, now).apply()
-
-        CoroutineScope(Dispatchers.Main).launch {
+        CoroutineScope(Dispatchers.IO).launch {
             try {
-                val releaseInfo = withContext(Dispatchers.IO) {
-                    fetchLatestRelease()
-                } ?: return@launch
+                val prefs = activity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                val lastCheck = prefs.getLong(KEY_LAST_CHECK, 0L)
+                val now = System.currentTimeMillis()
+                if (now - lastCheck < CHECK_INTERVAL_MS) {
+                    return@launch
+                }
+                prefs.edit().putLong(KEY_LAST_CHECK, now).apply()
+
+                val releaseInfo = fetchLatestRelease() ?: return@launch
 
                 val currentVersion = BuildConfig.VERSION_NAME
                 if (!isVersionNewer(releaseInfo.version, currentVersion)) {
@@ -52,20 +50,21 @@ object FenixUpdater {
                 val downloadUrl = releaseInfo.apkDownloadUrl ?: return@launch
 
                 // APK im Hintergrund laden (falls noch nicht vorhanden)
-                val apkFile = withContext(Dispatchers.IO) {
-                    val updatesDir = File(activity.cacheDir, "updates")
-                    if (!updatesDir.exists()) updatesDir.mkdirs()
-                    val targetFile = File(updatesDir, "fenix-${releaseInfo.tagName}.apk")
-                    if (targetFile.exists() && targetFile.length() > 5 * 1024 * 1024) {
-                        targetFile
-                    } else {
-                        downloadApk(activity, downloadUrl, releaseInfo.tagName) { /* silent */ }
-                    }
+                val updatesDir = File(activity.cacheDir, "updates")
+                if (!updatesDir.exists()) updatesDir.mkdirs()
+                val targetFile = File(updatesDir, "fenix-${releaseInfo.tagName}.apk")
+                val apkFile = if (targetFile.exists() && targetFile.length() > 5 * 1024 * 1024) {
+                    targetFile
+                } else {
+                    downloadApk(activity, downloadUrl, releaseInfo.tagName) { /* silent */ }
                 }
 
-                if (activity.isFinishing || activity.isDestroyed) return@launch
-                promptInstall(activity, apkFile)
-            } catch (_: Exception) {
+                withContext(Dispatchers.Main) {
+                    if (!activity.isFinishing && !activity.isDestroyed) {
+                        promptInstall(activity, apkFile)
+                    }
+                }
+            } catch (_: Throwable) {
                 // Im Hintergrund still ignorieren
             }
         }
