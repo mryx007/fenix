@@ -32,29 +32,31 @@ internal var SemanticsPropertyReceiver.resourceId by ResourceId
 internal fun WordmarkLogo() {
     Image(
         modifier =
-            Modifier.height(40.dp)
+            Modifier.height(36.dp)
                 .semantics {
                     testTagsAsResourceId = true
                     testTag = HOMEPAGE_WORDMARK_LOGO
                     resourceId = R.attr.fenixWordmarkLogo
                 }
-                .padding(end = 10.dp),
-        painter = painterResource(getAttr(R.attr.fenixWordmarkLogo)),
+                .padding(end = 8.dp),
+        painter = painterResource(R.mipmap.ic_launcher_foreground),
         contentDescription = null,
     )
 }
 
 @Composable
 internal fun WordmarkText(color: Color?) {
-    Image(
+    androidx.compose.material3.Text(
+        text = stringResource(R.string.app_name),
+        color = color ?: androidx.compose.material3.MaterialTheme.colorScheme.onSurface,
+        style = androidx.compose.material3.MaterialTheme.typography.titleLarge.copy(
+            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+            fontSize = 24.androidx.compose.ui.unit.sp,
+        ),
         modifier =
             Modifier.semantics {
-                    testTagsAsResourceId = true
-                    testTag = HOMEPAGE_WORDMARK_TEXT
-                }
-                .height(dimensionResource(R.dimen.wordmark_text_height)),
-        painter = painterResource(getAttr(R.attr.fenixWordmarkText)),
-        colorFilter = color?.let { ColorFilter.tint(it) },
-        contentDescription = stringResource(R.string.app_name),
+                testTagsAsResourceId = true
+                testTag = HOMEPAGE_WORDMARK_TEXT
+            },
     )
 }

@@ -89,10 +89,10 @@ jobs:
               "MOZ_ANDROID_MIN_SDK_VERSION": "26",
               "MOZ_APPSERVICES_IN_TREE": false,
               "GRADLE_MAVEN_REPOSITORIES": [
-                "https://maven.mozilla.org/maven2/",
-                "https://plugins.gradle.org/m2/",
+                "https://repo.maven.apache.org/maven2/",
                 "https://maven.google.com/",
-                "https://repo.maven.apache.org/maven2/"
+                "https://plugins.gradle.org/m2/",
+                "https://maven.mozilla.org/maven2/"
               ],
               "ALLOW_INSECURE_GRADLE_REPOSITORIES": false,
               "MOZ_ANDROID_DEBUGGABLE": false,
