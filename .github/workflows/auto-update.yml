@@ -105,6 +105,12 @@ jobs:
           cp config.status.json objdir-android/config.status.json
           cp config.status.json obj-x86_64-pc-linux-gnu/config.status.json
 
+          BUILD_DATE=$(date +'%Y%m%d%H%M%S')
+          echo "MOZ_BUILD_DATE=$BUILD_DATE" >> $GITHUB_ENV
+          echo "#define MOZ_BUILDID $BUILD_DATE" > buildid.h
+          cp buildid.h objdir-android/buildid.h
+          cp buildid.h obj-x86_64-pc-linux-gnu/buildid.h
+
       - name: Decode Keystore
         run: |
           echo "${{ secrets.RELEASE_KEYSTORE_BASE64 }}" | base64 -d > mobile/android/fenix/fenix-release.keystore
@@ -114,6 +120,7 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          MOZ_BUILD_DATE: ${{ env.MOZ_BUILD_DATE }}
         run: |
           cd mobile/android/fenix
           chmod +x gradlew
