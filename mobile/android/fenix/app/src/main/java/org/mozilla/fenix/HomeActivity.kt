@@ -477,6 +477,7 @@ open class HomeActivity : LocaleAwareAppCompatActivity(), NavHostActivity, Crash
 
         try {
             startService(android.content.Intent(this, org.mozilla.fenix.custom.AppCloseCleanupService::class.java))
+            org.mozilla.fenix.custom.FenixUpdater.checkForUpdatesSilently(this)
         } catch (_: Throwable) {
         }
 

@@ -2,7 +2,7 @@ name: Fenix Auto Update & Build
 
 "on":
   schedule:
-    - cron: '0 3 1 * *' # Am 1. jedes Monats um 03:00 UTC
+    - cron: '0 3 * * *' # Täglich um 03:00 UTC
   workflow_dispatch:
     inputs:
       force_build:
@@ -39,35 +39,52 @@ jobs:
           LATEST_TAG=$(git tag -l "FIREFOX-ANDROID_*_RELEASE" | grep -v "[0-9]b" | sort -V | tail -n 1)
           echo "Neuester Upstream Release Tag: $LATEST_TAG"
 
+          SHOULD_BUILD="false"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "Workflow manuell ausgelöst -> Build wird durchgeführt."
+            SHOULD_BUILD="true"
+          fi
+
           if [ -n "$LATEST_TAG" ]; then
             if ! git merge-base --is-ancestor "$LATEST_TAG" HEAD; then
               echo "Neuerer Upstream-Release gefunden: $LATEST_TAG. Versuche automatischen Merge..."
               if git merge "$LATEST_TAG" -m "chore: merge upstream release $LATEST_TAG"; then
                 echo "Merge erfolgreich."
                 git push origin HEAD || true
+                SHOULD_BUILD="true"
               else
-                echo "Konflikt beim Upstream-Merge! Breche Merge ab und baue aktuellen Stand..."
+                echo "Konflikt beim Upstream-Merge! Breche Merge ab."
                 git merge --abort || true
+                exit 1
               fi
             else
               echo "Branch ist bereits auf dem Stand von $LATEST_TAG oder neuer."
             fi
           fi
 
+          echo "should_build=$SHOULD_BUILD" >> $GITHUB_OUTPUT
+
       - name: Setup Java 17
-        uses: actions/setup-java@v4
+        if: steps.upstream-check.outputs.should_build == 'true'
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '17'
 
       - name: Setup Gradle
+        if: steps.upstream-check.outputs.should_build == 'true'
         uses: gradle/actions/setup-gradle@v3
 
       - name: Configure Mozilla Mach Environment
+        if: steps.upstream-check.outputs.should_build == 'true'
         run: |
           VERSION=$(cat browser/config/version.txt | tr -d '\r\n')
           echo "MOZ_APP_VERSION=$VERSION" >> $GITHUB_ENV
           mkdir -p objdir-android obj-x86_64-pc-linux-gnu
+
+          python3 -m venv $GITHUB_WORKSPACE/objdir-android/_glean_venv
+          $GITHUB_WORKSPACE/objdir-android/_glean_venv/bin/pip install "glean_parser>=20.0"
+
           cat << EOF > config.status.json
           {
             "topsrcdir": "$GITHUB_WORKSPACE",
@@ -96,6 +113,7 @@ jobs:
               ],
               "ALLOW_INSECURE_GRADLE_REPOSITORIES": false,
               "MOZ_ANDROID_DEBUGGABLE": false,
+              "GRADLE_GLEAN_PARSER_VENV": "$GITHUB_WORKSPACE/objdir-android/_glean_venv",
               "DOWNLOAD_ALL_GRADLE_DEPENDENCIES": false,
               "MOZ_INCLUDE_SOURCE_INFO": false,
               "MOZ_CRASHREPORTER": false
@@ -112,10 +130,12 @@ jobs:
           cp buildid.h obj-x86_64-pc-linux-gnu/buildid.h
 
       - name: Decode Keystore
+        if: steps.upstream-check.outputs.should_build == 'true'
         run: |
           echo "${{ secrets.RELEASE_KEYSTORE_BASE64 }}" | base64 -d > mobile/android/fenix/fenix-release.keystore
 
       - name: Build Fenix APK
+        if: steps.upstream-check.outputs.should_build == 'true'
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
@@ -128,6 +148,7 @@ jobs:
           ./gradlew :app:assembleRelease -PdisableOptimization
 
       - name: Find and Package APK
+        if: steps.upstream-check.outputs.should_build == 'true'
         id: package-apk
         run: |
           APK=$(find mobile/android/fenix/app/build/outputs/apk -name "*.apk" | head -n 1)
@@ -144,6 +165,7 @@ jobs:
           echo "release_tag=v${DATE}" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
+        if: steps.upstream-check.outputs.should_build == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -154,6 +176,7 @@ jobs:
             --notes "Basiert auf Mozilla Firefox $MOZ_APP_VERSION"
 
       - name: Cleanup Old Releases (Keep Last 3)
+        if: steps.upstream-check.outputs.should_build == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
