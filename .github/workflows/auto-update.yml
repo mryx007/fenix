@@ -1,6 +1,6 @@
 name: Fenix Auto Update & Build
 
-on:
+"on":
   schedule:
     - cron: '0 3 1 * *' # Am 1. jedes Monats um 03:00 UTC
   workflow_dispatch:
@@ -104,9 +104,4 @@ jobs:
           APK="${{ steps.package-apk.outputs.apk_path }}"
           gh release create "$TAG" "$APK" \
             --title "Fenix Release $TAG" \
-            --notes "Automatischer monatlicher Fenix Build mit benutzerdefinierten Features:
-- Tabs schließen beim Wischen (Close on swipe)
-- Suchleiste per Wischgeste auf Homescreen
-- LeakCanary entfernt
-- Neues Fenix Branding & Icon
-- Fester Release-Schlüssel für nahtlose Updates"
+            --notes "Automatischer monatlicher Fenix Build mit benutzerdefinierten Features: Tabs schliessen beim Wischen, Suche-Geste auf Homescreen, LeakCanary entfernt, Fenix Branding & fester Update-Schluessel."
