@@ -4,10 +4,13 @@
 
 package org.mozilla.fenix.home.topsites
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -37,7 +40,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -118,6 +123,7 @@ internal fun TopSites(
         onSponsorPrivacyClicked = interactor::onSponsorPrivacyClicked,
         onTopSitesItemBound = onTopSitesItemBound,
         onAddShortcutClicked = onAddShortcutClicked,
+        onMoveTopSiteClicked = interactor::onMoveTopSiteClicked,
         onExpandToggleClick = {
             val expanded = !isExpanded
             isExpanded = expanded
@@ -144,6 +150,7 @@ internal fun TopSites(
  * @param onSponsorPrivacyClicked Invoked when the user clicks on the "Our sponsors & your privacy" menu item.
  * @param onTopSitesItemBound Invoked during the composition of a top site item.
  * @param onAddShortcutClicked Invoked when the user clicks on the "Add shortcut" tile.
+ * @param onMoveTopSiteClicked Invoked when the user clicks on a move menu item.
  * @param onExpandToggleClick Invoked when the user clicks on the expand/collapse control.
  * @param showAddShortcut Whether to display the "Add shortcut" tile after the top sites.
  * @param showExpandToggle Whether to display the control that expands and collapses the grid.
@@ -164,6 +171,7 @@ fun TopSites(
     onSponsorPrivacyClicked: () -> Unit,
     onTopSitesItemBound: () -> Unit,
     onAddShortcutClicked: () -> Unit,
+    onMoveTopSiteClicked: ((TopSite, Boolean) -> Unit)? = null,
     onExpandToggleClick: () -> Unit = {},
     showAddShortcut: Boolean = false,
     showExpandToggle: Boolean = false,
@@ -192,6 +200,7 @@ fun TopSites(
             onSponsorPrivacyClicked = onSponsorPrivacyClicked,
             onTopSitesItemBound = onTopSitesItemBound,
             onAddShortcutClicked = onAddShortcutClicked,
+            onMoveTopSiteClicked = onMoveTopSiteClicked,
         )
 
         if (showExpandToggle) {
@@ -261,6 +270,7 @@ private fun TopSitesGrid(
     onSponsorPrivacyClicked: () -> Unit,
     onTopSitesItemBound: () -> Unit,
     onAddShortcutClicked: () -> Unit,
+    onMoveTopSiteClicked: ((TopSite, Boolean) -> Unit)? = null,
 ) {
     val topSiteRows = topSites.chunked(TOP_SITES_PER_ROW)
     val addShortcutInCurrentRow =
@@ -280,6 +290,7 @@ private fun TopSitesGrid(
 
                 TopSiteGridRow(
                     items = items,
+                    allSites = topSites,
                     topSiteColors = topSiteColors,
                     showAddShortcut = isLastRow && addShortcutInCurrentRow,
                     onTopSiteClick = onTopSiteClick,
@@ -292,6 +303,7 @@ private fun TopSitesGrid(
                     onSponsorPrivacyClicked = onSponsorPrivacyClicked,
                     onTopSitesItemBound = onTopSitesItemBound,
                     onAddShortcutClicked = onAddShortcutClicked,
+                    onMoveTopSiteClicked = onMoveTopSiteClicked,
                 )
 
                 if (!isLastRow || addShortcutInNewRow) {
@@ -315,6 +327,7 @@ private fun TopSitesGrid(
 @Composable
 private fun TopSiteGridRow(
     items: List<TopSite>,
+    allSites: List<TopSite>,
     topSiteColors: TopSiteColors,
     showAddShortcut: Boolean,
     onTopSiteClick: (TopSite) -> Unit,
@@ -327,9 +340,13 @@ private fun TopSiteGridRow(
     onSponsorPrivacyClicked: () -> Unit,
     onTopSitesItemBound: () -> Unit,
     onAddShortcutClicked: () -> Unit,
+    onMoveTopSiteClicked: ((TopSite, Boolean) -> Unit)? = null,
 ) {
     Row(modifier = Modifier.defaultMinSize(minWidth = TOP_SITES_ROW_WIDTH.dp)) {
         items.forEachIndexed { position, topSite ->
+            val siteIndex = allSites.indexOfFirst { it.url == topSite.url }
+            val canMoveLeft = siteIndex > 0
+            val canMoveRight = siteIndex != -1 && siteIndex < allSites.lastIndex
             TopSiteItem(
                 topSite = topSite,
                 menuItems =
@@ -340,6 +357,9 @@ private fun TopSiteGridRow(
                         onRemoveTopSiteClicked = onRemoveTopSiteClicked,
                         onSettingsClicked = onSettingsClicked,
                         onSponsorPrivacyClicked = onSponsorPrivacyClicked,
+                        canMoveLeft = canMoveLeft,
+                        canMoveRight = canMoveRight,
+                        onMoveTopSiteClicked = onMoveTopSiteClicked,
                     ),
                 position = position,
                 topSiteColors = topSiteColors,
@@ -466,19 +486,6 @@ fun TopSiteItem(
                     topSite = topSite,
                     backgroundColor = topSiteColors.faviconCardBackgroundColor,
                 )
-
-                if (topSite is TopSite.Pinned || topSite is TopSite.Default) {
-                    Box(
-                        modifier = Modifier.size(16.dp),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Icon(
-                            painter = painterResource(id = iconsR.drawable.mozac_ic_pin_8),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.secondary,
-                        )
-                    }
-                }
             }
 
             Spacer(modifier = Modifier.height(6.dp))
@@ -561,32 +568,53 @@ private fun TopSiteFaviconCard(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center,
         ) {
-            Surface(
-                modifier = Modifier.size(TOP_SITES_FAVICON_SIZE.dp),
-                color = backgroundColor,
-                shape = MaterialTheme.shapes.extraSmall,
-            ) {
-                TopSiteFavicon(topSite = topSite)
-            }
+            TopSiteFavicon(topSite = topSite)
         }
     }
 }
 
 @Composable
 private fun TopSiteFavicon(topSite: TopSite) {
-    when (val favicon = getTopSitesFavicon(topSite)) {
-        is TopSitesFavicon.ImageUrl ->
-            Favicon(
-                url = topSite.url,
-                size = TOP_SITES_FAVICON_SIZE.dp,
-                imageUrl = favicon.imageUrl,
-            )
+    val context = LocalContext.current
+    val iconVersion = org.mozilla.fenix.custom.CustomTopSitesIcons.iconVersion
+    val customBitmap = remember(topSite.url, iconVersion) {
+        org.mozilla.fenix.custom.CustomTopSitesIcons.getCustomIconBitmap(context, topSite.url)
+    }
 
-        is TopSitesFavicon.Drawable ->
-            Favicon(
-                size = TOP_SITES_FAVICON_SIZE.dp,
-                imageResource = favicon.drawableResId,
-            )
+    if (customBitmap != null) {
+        Image(
+            bitmap = customBitmap.asImageBitmap(),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize().clip(CircleShape),
+            contentScale = ContentScale.Crop,
+        )
+    } else {
+        val customIconUrl = remember(topSite.url, iconVersion) {
+            org.mozilla.fenix.custom.CustomTopSitesIcons.getIconUrl(context, topSite.url)
+        }
+        val favicon = when {
+            !customIconUrl.isNullOrBlank() -> TopSitesFavicon.ImageUrl(imageUrl = customIconUrl)
+            else -> getTopSitesFavicon(topSite)
+        }
+
+        when (favicon) {
+            is TopSitesFavicon.ImageUrl ->
+                Favicon(
+                    url = topSite.url,
+                    size = TOP_SITES_FAVICON_CARD_SIZE.dp,
+                    modifier = Modifier.fillMaxSize().clip(CircleShape),
+                    shape = CircleShape,
+                    imageUrl = favicon.imageUrl,
+                )
+
+            is TopSitesFavicon.Drawable ->
+                Favicon(
+                    size = TOP_SITES_FAVICON_CARD_SIZE.dp,
+                    modifier = Modifier.fillMaxSize().clip(CircleShape),
+                    shape = CircleShape,
+                    imageResource = favicon.drawableResId,
+                )
+        }
     }
 }
 
@@ -598,6 +626,9 @@ internal fun getMenuItems(
     onRemoveTopSiteClicked: (topSite: TopSite) -> Unit,
     onSettingsClicked: () -> Unit,
     onSponsorPrivacyClicked: () -> Unit,
+    canMoveLeft: Boolean = false,
+    canMoveRight: Boolean = false,
+    onMoveTopSiteClicked: ((topSite: TopSite, moveLeft: Boolean) -> Unit)? = null,
 ): List<MenuItem> {
     val isPinnedSite = topSite is TopSite.Pinned || topSite is TopSite.Default
     val isProvidedSite = topSite is TopSite.Provided
@@ -620,6 +651,25 @@ internal fun getMenuItems(
                 onClick = { onEditTopSiteClicked(topSite) },
             )
         )
+
+        if (onMoveTopSiteClicked != null) {
+            if (canMoveLeft) {
+                result.add(
+                    MenuItem(
+                        title = "◀ Nach links verschieben",
+                        onClick = { onMoveTopSiteClicked(topSite, true) },
+                    )
+                )
+            }
+            if (canMoveRight) {
+                result.add(
+                    MenuItem(
+                        title = "Nach rechts verschieben ▶",
+                        onClick = { onMoveTopSiteClicked(topSite, false) },
+                    )
+                )
+            }
+        }
     }
 
     if (!isProvidedSite) {

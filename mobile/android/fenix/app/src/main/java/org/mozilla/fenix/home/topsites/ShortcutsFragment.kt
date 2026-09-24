@@ -85,6 +85,7 @@ class ShortcutsFragment : Fragment(), SystemInsetsPaddedFragment {
                                 DefaultTopSitesView(
                                     appStore = requireComponents.appStore,
                                     settings = requireComponents.settings,
+                                    context = requireContext(),
                                 ),
                             storage = requireComponents.core.topSitesStorage,
                             config =

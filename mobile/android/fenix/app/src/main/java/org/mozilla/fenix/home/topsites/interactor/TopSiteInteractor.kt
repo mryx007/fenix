@@ -96,6 +96,11 @@ interface TopSiteInteractor {
         source: AddShortcutSource,
         entryPoint: AddShortcutEntryPoint,
     )
+
+    /**
+     * Moves the given top site left or right.
+     */
+    fun onMoveTopSiteClicked(topSite: TopSite, moveLeft: Boolean) {}
 }
 
 /** Default implementation of [TopSiteInteractor]. */
@@ -162,5 +167,9 @@ class DefaultTopSiteInteractor(private val controller: TopSiteController) : TopS
 
     override fun onShortcutsLibraryViewed() {
         controller.handleShortcutsLibraryViewed()
+    }
+
+    override fun onMoveTopSiteClicked(topSite: TopSite, moveLeft: Boolean) {
+        controller.handleMoveTopSite(topSite, moveLeft)
     }
 }

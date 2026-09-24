@@ -31,13 +31,25 @@ internal fun getTopSitesFavicon(topSite: TopSite): TopSitesFavicon {
         return TopSitesFavicon.ImageUrl(imageUrl = topSite.imageUrl)
     }
 
-    return when (topSite.url) {
-        "https://tenki.jp/" -> TopSitesFavicon.ImageUrl(imageUrl = "https://tenki.jp/favicon.ico")
-        "https://m.yahoo.co.jp/" ->
+    val urlLower = topSite.url.lowercase()
+    val titleLower = (topSite.title ?: "").lowercase()
+
+    return when {
+        urlLower.contains("deskmodder.de") ->
+            TopSitesFavicon.ImageUrl(imageUrl = "https://www.deskmodder.de/apple-touch-icon.png")
+
+        urlLower.contains("reddit.com") ->
+            TopSitesFavicon.ImageUrl(imageUrl = "https://www.redditstatic.com/shreddit/assets/favicon/192x192.png")
+
+        urlLower.contains("usenet") ->
+            TopSitesFavicon.Drawable(R.drawable.ic_usenet)
+
+        topSite.url == "https://tenki.jp/" -> TopSitesFavicon.ImageUrl(imageUrl = "https://tenki.jp/favicon.ico")
+        topSite.url == "https://m.yahoo.co.jp/" ->
             TopSitesFavicon.ImageUrl(imageUrl = "https://s.yimg.jp/c/icon/s/bsc/2.0/favicon.ico")
-        "https://ameblo.jp/" ->
+        topSite.url == "https://ameblo.jp/" ->
             TopSitesFavicon.ImageUrl(imageUrl = "https://stat100.ameba.jp/common_style/img/favicon.ico")
-        "https://blog.mozilla.org/ja/firefox-ja/android-guide/" ->
+        topSite.url == "https://blog.mozilla.org/ja/firefox-ja/android-guide/" ->
             TopSitesFavicon.Drawable(R.drawable.ic_japan_onboarding_favicon)
 
         else -> TopSitesFavicon.ImageUrl(imageUrl = null)

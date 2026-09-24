@@ -1301,6 +1301,12 @@ open class HomeActivity : LocaleAwareAppCompatActivity(), NavHostActivity, Crash
     @Deprecated("Deprecated in Java")
     // https://github.com/mozilla-mobile/fenix/issues/19919
     final override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == REQUEST_CODE_PICK_TOP_SITE_ICON) {
+            val uri = if (resultCode == RESULT_OK) data?.data else null
+            onTopSiteIconPicked?.invoke(uri)
+            onTopSiteIconPicked = null
+            return
+        }
         supportFragmentManager.primaryNavigationFragment?.childFragmentManager?.fragments?.forEach {
             if (it is ActivityResultHandler && it.onActivityResult(requestCode, data, resultCode)) {
                 return
@@ -1843,6 +1849,9 @@ open class HomeActivity : LocaleAwareAppCompatActivity(), NavHostActivity, Crash
     }
 
     companion object {
+        const val REQUEST_CODE_PICK_TOP_SITE_ICON = 9921
+        var onTopSiteIconPicked: ((android.net.Uri?) -> Unit)? = null
+
         const val OPEN_TO_BROWSER = "open_to_browser"
         const val OPEN_TO_BROWSER_AND_LOAD = "open_to_browser_and_load"
         const val LENS_RESULT_URL = "lens_result_url"

@@ -40,18 +40,7 @@ class TopSitesConfigCreatorTest {
     }
 
     @Test
-    fun `WHEN hide top sites flag is not enabled THEN it returns TopSitesConfig with non-null frequencyConfig`() {
-        FxNimbus.features.homepageHideFrecentTopSites.withCachedValue(HomepageHideFrecentTopSites(enabled = false))
-
-        val topSitesConfig = getTopSitesConfig(settings = settings, store = browserStore).invoke()
-
-        assertNotNull(topSitesConfig.frecencyConfig)
-    }
-
-    @Test
-    fun `WHEN hide top sites flag is enabled THEN it returns TopSitesConfig with null frequencyConfig`() {
-        FxNimbus.features.homepageHideFrecentTopSites.withCachedValue(HomepageHideFrecentTopSites(enabled = true))
-
+    fun `WHEN getTopSitesConfig is called THEN it returns TopSitesConfig with null frecencyConfig`() {
         val topSitesConfig = getTopSitesConfig(settings = settings, store = browserStore).invoke()
 
         assertNull(topSitesConfig.frecencyConfig)

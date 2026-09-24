@@ -5,12 +5,17 @@
 package org.mozilla.fenix.home.topsites.controller
 
 import android.app.Activity
+import android.content.Intent
 import android.content.res.ColorStateList
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.view.LayoutInflater
 import android.widget.EditText
+import android.widget.ImageView
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.R as appcompatR
 import androidx.appcompat.app.AlertDialog
+import org.mozilla.fenix.HomeActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.navigation.NavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -106,6 +111,8 @@ interface TopSiteController {
         source: AddShortcutSource,
         entryPoint: AddShortcutEntryPoint,
     )
+
+    fun handleMoveTopSite(topSite: TopSite, moveLeft: Boolean) {}
 }
 
 /** The default implementation of [TopSiteController]. */
@@ -154,16 +161,63 @@ class DefaultTopSiteController(
     }
 
     override fun handleEditTopSiteClicked(topSite: TopSite) {
-        activity.let {
-            val customLayout = LayoutInflater.from(it).inflate(R.layout.top_sites_edit_dialog, null)
+        activity.let { act ->
+            val customLayout = LayoutInflater.from(act).inflate(R.layout.top_sites_edit_dialog, null)
             val titleEditText = customLayout.findViewById<EditText>(R.id.top_site_title)
             val urlEditText = customLayout.findViewById<TextInputEditText>(R.id.top_site_url)
             val urlLayout = customLayout.findViewById<TextInputLayout>(R.id.top_site_url_layout)
 
+            val iconPreview = customLayout.findViewById<ImageView>(R.id.top_site_icon_preview)
+            val buttonPickIcon = customLayout.findViewById<android.view.View>(R.id.button_pick_icon)
+            val buttonRemoveIcon = customLayout.findViewById<android.view.View>(R.id.button_remove_icon)
+
             titleEditText.setText(topSite.title)
             urlEditText.setText(topSite.url)
 
-            MaterialAlertDialogBuilder(it)
+            var pendingIconUri: Uri? = null
+            var resetIcon = false
+
+            val existingCustomBitmap = org.mozilla.fenix.custom.CustomTopSitesIcons.getCustomIconBitmap(act, topSite.url)
+            if (existingCustomBitmap != null) {
+                iconPreview.setImageBitmap(existingCustomBitmap)
+                buttonRemoveIcon.visibility = android.view.View.VISIBLE
+            } else {
+                buttonRemoveIcon.visibility = android.view.View.GONE
+            }
+
+            buttonPickIcon.setOnClickListener {
+                HomeActivity.onTopSiteIconPicked = { uri ->
+                    if (uri != null) {
+                        pendingIconUri = uri
+                        resetIcon = false
+                        try {
+                            act.contentResolver.openInputStream(uri)?.use { stream ->
+                                val bmp = BitmapFactory.decodeStream(stream)
+                                iconPreview.setImageBitmap(bmp)
+                            }
+                            buttonRemoveIcon.visibility = android.view.View.VISIBLE
+                        } catch (_: Throwable) {
+                        }
+                    }
+                }
+                val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                    type = "image/*"
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                }
+                act.startActivityForResult(
+                    Intent.createChooser(intent, "Bild auswählen"),
+                    HomeActivity.REQUEST_CODE_PICK_TOP_SITE_ICON,
+                )
+            }
+
+            buttonRemoveIcon.setOnClickListener {
+                pendingIconUri = null
+                resetIcon = true
+                iconPreview.setImageDrawable(null)
+                buttonRemoveIcon.visibility = android.view.View.GONE
+            }
+
+            MaterialAlertDialogBuilder(act)
                 .apply {
                     setTitle(R.string.top_sites_edit_dialog_title)
                     setView(customLayout)
@@ -179,23 +233,55 @@ class DefaultTopSiteController(
                         val urlText = urlEditText.text.toString()
 
                         if (urlText.isUrl()) {
+                            val normalizedUrl = urlText.toNormalizedUrl()
+
+                            if (resetIcon) {
+                                org.mozilla.fenix.custom.CustomTopSitesIcons.removeLocalIcon(act, topSite.url)
+                                if (normalizedUrl != topSite.url) {
+                                    org.mozilla.fenix.custom.CustomTopSitesIcons.removeLocalIcon(act, normalizedUrl)
+                                }
+                            } else if (pendingIconUri != null) {
+                                org.mozilla.fenix.custom.CustomTopSitesIcons.saveLocalIcon(act, normalizedUrl, pendingIconUri!!)
+                                if (normalizedUrl != topSite.url) {
+                                    org.mozilla.fenix.custom.CustomTopSitesIcons.removeLocalIcon(act, topSite.url)
+                                }
+                            } else if (normalizedUrl != topSite.url) {
+                                if (org.mozilla.fenix.custom.CustomTopSitesIcons.hasCustomIcon(act, topSite.url)) {
+                                    val oldFile = org.mozilla.fenix.custom.CustomTopSitesIcons.getFileForUrl(act, topSite.url)
+                                    if (oldFile.exists()) {
+                                        val newFile = org.mozilla.fenix.custom.CustomTopSitesIcons.getFileForUrl(act, normalizedUrl)
+                                        oldFile.copyTo(newFile, overwrite = true)
+                                        org.mozilla.fenix.custom.CustomTopSitesIcons.removeLocalIcon(act, topSite.url)
+                                    }
+                                }
+                            }
+
+                            if (normalizedUrl != topSite.url) {
+                                val savedOrder = org.mozilla.fenix.custom.CustomTopSitesOrder.getSavedOrder(act).toMutableList()
+                                val idx = savedOrder.indexOf(topSite.url)
+                                if (idx != -1) {
+                                    savedOrder[idx] = normalizedUrl
+                                    org.mozilla.fenix.custom.CustomTopSitesOrder.saveOrder(act, savedOrder)
+                                }
+                            }
+
                             viewLifecycleScope.launch {
                                 updateTopSite(
                                     topSite = topSite,
                                     title = titleEditText.text.toString(),
-                                    url = urlText.toNormalizedUrl(),
+                                    url = normalizedUrl,
                                 )
                             }
 
                             dialog.dismiss()
                         } else {
                             val criticalColor =
-                                ColorStateList.valueOf(activity.getColorFromAttr(appcompatR.attr.colorError))
+                                ColorStateList.valueOf(act.getColorFromAttr(appcompatR.attr.colorError))
                             urlLayout.setErrorIconTintList(criticalColor)
                             urlLayout.setErrorTextColor(criticalColor)
                             urlLayout.boxStrokeErrorColor = criticalColor
 
-                            urlLayout.error = activity.resources.getString(R.string.top_sites_edit_dialog_url_error)
+                            urlLayout.error = act.resources.getString(R.string.top_sites_edit_dialog_url_error)
 
                             urlLayout.setErrorIconDrawable(iconsR.drawable.mozac_ic_warning_fill_24)
                         }
@@ -227,6 +313,19 @@ class DefaultTopSiteController(
                 title = title,
                 url = url,
             )
+        }
+    }
+
+    override fun handleMoveTopSite(topSite: TopSite, moveLeft: Boolean) {
+        val currentSites = appStore.state.topSites.toMutableList()
+        val index = currentSites.indexOfFirst { it.url == topSite.url }
+        if (index == -1) return
+        val targetIndex = if (moveLeft) index - 1 else index + 1
+        if (targetIndex in currentSites.indices) {
+            val item = currentSites.removeAt(index)
+            currentSites.add(targetIndex, item)
+            org.mozilla.fenix.custom.CustomTopSitesOrder.saveOrder(activity, currentSites.map { it.url })
+            appStore.dispatch(AppAction.TopSitesChange(currentSites))
         }
     }
 

@@ -4,22 +4,17 @@
 
 package org.mozilla.fenix.home.topsites
 
-import androidx.core.net.toUri
 import mozilla.components.browser.state.state.selectedOrDefaultSearchEngine
 import mozilla.components.browser.state.store.BrowserStore
-import mozilla.components.concept.storage.FrecencyThresholdOption
 import mozilla.components.feature.top.sites.TopSitesConfig
 import mozilla.components.feature.top.sites.TopSitesFeature
-import mozilla.components.feature.top.sites.TopSitesFrecencyConfig
 import mozilla.components.feature.top.sites.TopSitesProviderConfig
-import org.mozilla.fenix.ext.containsQueryParameters
 import org.mozilla.fenix.home.HomeFragment
 import org.mozilla.fenix.home.topsites.TopSitesConfigConstants.AMAZON_SEARCH_ENGINE_NAME
 import org.mozilla.fenix.home.topsites.TopSitesConfigConstants.AMAZON_SPONSORED_TITLE
 import org.mozilla.fenix.home.topsites.TopSitesConfigConstants.EBAY_SPONSORED_TITLE
 import org.mozilla.fenix.home.topsites.TopSitesConfigConstants.TOP_SITES_PROVIDER_LIMIT
 import org.mozilla.fenix.home.topsites.TopSitesConfigConstants.TOP_SITES_PROVIDER_MAX_THRESHOLD
-import org.mozilla.fenix.nimbus.FxNimbus
 import org.mozilla.fenix.utils.Settings
 
 /**
@@ -37,14 +32,7 @@ internal fun getTopSitesConfig(
         val limit = if (settings.suppressSponsoredTopSitesEnabled) 0 else TOP_SITES_PROVIDER_LIMIT
         TopSitesConfig(
             totalSites = settings.topSitesMaxLimit,
-            frecencyConfig =
-                if (FxNimbus.features.homepageHideFrecentTopSites.value().enabled) {
-                    null
-                } else {
-                    TopSitesFrecencyConfig(frecencyTresholdOption = FrecencyThresholdOption.SKIP_ONE_TIME_PAGES) {
-                        !it.url.toUri().containsQueryParameters(settings.frecencyFilterQuery)
-                    }
-                },
+            frecencyConfig = null,
             providerConfig =
                 TopSitesProviderConfig(
                     showProviderTopSites = settings.showContileFeature,

@@ -238,6 +238,10 @@ class SessionControlInteractor(
         topSiteController.handleTopSiteLongClicked(topSite)
     }
 
+    override fun onMoveTopSiteClicked(topSite: TopSite, moveLeft: Boolean) {
+        topSiteController.handleMoveTopSite(topSite, moveLeft)
+    }
+
     override fun onShowAllTopSitesClicked() {
         topSiteController.handleShowAllTopSitesClicked()
     }

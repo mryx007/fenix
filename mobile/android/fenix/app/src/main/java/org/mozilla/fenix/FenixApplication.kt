@@ -511,16 +511,7 @@ open class FenixApplication : Application(), Provider, ThemeProvider {
                     // we can prevent with this.
                     components.core.topSitesStorage.getTopSites(
                         totalSites = components.settings.topSitesMaxLimit,
-                        frecencyConfig =
-                            if (FxNimbus.features.homepageHideFrecentTopSites.value().enabled) {
-                                null
-                            } else {
-                                TopSitesFrecencyConfig(
-                                    frecencyTresholdOption = FrecencyThresholdOption.SKIP_ONE_TIME_PAGES
-                                ) {
-                                    !it.url.toUri().containsQueryParameters(components.settings.frecencyFilterQuery)
-                                }
-                            },
+                        frecencyConfig = null,
                         providerConfig =
                             TopSitesProviderConfig(
                                 showProviderTopSites = components.settings.showContileFeature,

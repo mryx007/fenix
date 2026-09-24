@@ -40,6 +40,8 @@ internal fun Shortcuts(
     ) {
         topSites.forEachIndexed { position, topSite ->
             item {
+                val canMoveLeft = position > 0
+                val canMoveRight = position < topSites.lastIndex
                 TopSiteItem(
                     topSite = topSite,
                     menuItems =
@@ -50,6 +52,9 @@ internal fun Shortcuts(
                             onRemoveTopSiteClicked = interactor::onRemoveTopSiteClicked,
                             onSettingsClicked = interactor::onSettingsClicked,
                             onSponsorPrivacyClicked = interactor::onSponsorPrivacyClicked,
+                            canMoveLeft = canMoveLeft,
+                            canMoveRight = canMoveRight,
+                            onMoveTopSiteClicked = interactor::onMoveTopSiteClicked,
                         ),
                     position = position,
                     topSiteColors = topSiteColors,
