@@ -1,18 +1,17 @@
-![Firefox Browser](./docs/readme/readme-banner.svg)
+# Fenix
 
-[Firefox](https://firefox.com/) is a fast, reliable and private web browser from the non-profit [Mozilla organization](https://mozilla.org/).
+A customized, lightweight Android browser based on Firefox for Android, tailored for speed, enhanced navigation, and effortless updates.
 
-### Contributing
+---
 
-To learn how to contribute to Firefox read the [Firefox Contributors' Quick Reference document](https://firefox-source-docs.mozilla.org/contributing/contribution_quickref.html).
+## Features
 
-We use [bugzilla.mozilla.org](https://bugzilla.mozilla.org/) as our issue tracker, please file bugs there.
+- **Silent 1-Click In-App Updater:** Periodically checks for new GitHub releases in the background, downloads updates silently to the cache, and provides an effortless one-tap installation prompt.
+- **Expanded Navigation Toolbar:** Quick-access actions placed directly in the bottom toolbar (Back, Forward, Home, New Tab, Bookmarks, Share, and Tab Switcher).
+- **Auto-Close Tabs on Exit:** Cleans up open tabs automatically when leaving the app for a clean start every time.
 
-### Resources
+---
 
-* [Firefox Source Docs](https://firefox-source-docs.mozilla.org/) is our primary documentation repository
-* Nightly development builds can be downloaded from [Firefox Nightly page](https://www.mozilla.org/firefox/channel/desktop/#nightly)
+## Download
 
-If you have a question about developing Firefox, and can't find the solution
-on [Firefox Source Docs](https://firefox-source-docs.mozilla.org/), you can try asking your question on Matrix at
-chat.mozilla.org in the [Introduction channel](https://chat.mozilla.org/#/room/#introduction:mozilla.org).
+Get the latest signed APK directly from the [GitHub Releases](https://github.com/mryx007/fenix/releases/latest) page.
