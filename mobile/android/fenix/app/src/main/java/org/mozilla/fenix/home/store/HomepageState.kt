@@ -23,6 +23,7 @@ import org.mozilla.fenix.home.recentsyncedtabs.RecentSyncedTab
 import org.mozilla.fenix.home.recentsyncedtabs.RecentSyncedTabState
 import org.mozilla.fenix.home.recenttabs.RecentTab
 import org.mozilla.fenix.home.recentvisits.RecentlyVisitedItem
+import org.mozilla.fenix.home.topsites.TOP_SITES_TO_SHOW
 import org.mozilla.fenix.home.topsites.TopSiteState
 import org.mozilla.fenix.termsofuse.store.PrivacyNoticeBannerState
 import org.mozilla.fenix.utils.Settings
@@ -216,7 +217,7 @@ internal sealed class HomepageState {
                                 recommendationState.pocketStories.isNotEmpty() &&
                                 !settings.privateModeAndStoriesEntryPointEnabled
                         },
-                    showTopSitesHeader = !(settings.privateModeAndStoriesEntryPointEnabled && topSites.size < 8),
+                    showTopSitesHeader = !(settings.privateModeAndStoriesEntryPointEnabled && topSites.size < TOP_SITES_TO_SHOW),
                     showPrivacyReport = settings.showPrivacyReportFeature,
                     longfoxEnabled = settings.longfoxEnabled,
                     showLongfoxAnimation = settings.longfoxEnabled && longfoxEntryPointReady,

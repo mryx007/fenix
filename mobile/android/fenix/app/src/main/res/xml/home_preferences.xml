@@ -19,6 +19,39 @@
         android:key="@string/pref_key_enable_contile"
         android:title="@string/customize_toggle_contile" />
 
+    <androidx.preference.SeekBarPreference
+        android:key="@string/pref_key_top_sites_size"
+        android:dependency="@string/pref_key_show_top_sites"
+        android:defaultValue="60"
+        android:max="72"
+        app:min="32"
+        app:showSeekBarValue="true"
+        app:updatesContinuously="true"
+        android:title="@string/preferences_top_sites_size"
+        android:summary="@string/preferences_top_sites_size_summary" />
+
+    <androidx.preference.SeekBarPreference
+        android:key="@string/pref_key_top_sites_spacing"
+        android:dependency="@string/pref_key_show_top_sites"
+        android:defaultValue="12"
+        android:max="40"
+        app:min="0"
+        app:showSeekBarValue="true"
+        app:updatesContinuously="true"
+        android:title="@string/preferences_top_sites_spacing"
+        android:summary="@string/preferences_top_sites_spacing_summary" />
+
+    <androidx.preference.SeekBarPreference
+        android:key="@string/pref_key_top_sites_font_size"
+        android:dependency="@string/pref_key_show_top_sites"
+        android:defaultValue="12"
+        android:max="16"
+        app:min="8"
+        app:showSeekBarValue="true"
+        app:updatesContinuously="true"
+        android:title="@string/preferences_top_sites_font_size"
+        android:summary="@string/preferences_top_sites_font_size_summary" />
+
     <androidx.preference.SwitchPreferenceCompat
       android:key="@string/pref_key_show_homepage_weather_widget"
       android:title="@string/customize_toggle_weather" />

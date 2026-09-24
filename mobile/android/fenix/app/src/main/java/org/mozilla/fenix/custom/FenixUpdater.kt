@@ -28,15 +28,49 @@ object FenixUpdater {
     private const val PREFS_NAME = "fenix_updater_prefs"
     private const val KEY_LAST_CHECK = "last_check_timestamp"
     private const val KEY_LAST_PROMPTED_TAG = "last_prompted_tag"
-    private const val CHECK_INTERVAL_MS = 4 * 60 * 60 * 1000L // alle 4 Stunden im Hintergrund prüfen
+
+    private inline fun <T> allowDiskReads(block: () -> T): T {
+        val oldPolicy = android.os.StrictMode.allowThreadDiskReads()
+        return try {
+            block()
+        } finally {
+            android.os.StrictMode.setThreadPolicy(oldPolicy)
+        }
+    }
+
+    fun isAutoCheckEnabled(context: Context): Boolean = allowDiskReads {
+        try {
+            val defPrefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
+            val key = context.getString(org.mozilla.fenix.R.string.pref_key_auto_update_check)
+            defPrefs.getBoolean(key, true)
+        } catch (_: Throwable) {
+            true
+        }
+    }
+
+    fun getCheckIntervalHours(context: Context): Int = allowDiskReads {
+        try {
+            val defPrefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(context)
+            val key = context.getString(org.mozilla.fenix.R.string.pref_key_update_check_interval)
+            defPrefs.getInt(key, 4).coerceIn(1, 24)
+        } catch (_: Throwable) {
+            4
+        }
+    }
 
     fun checkForUpdatesSilently(activity: Activity) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val prefs = activity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+                if (!isAutoCheckEnabled(activity)) {
+                    return@launch
+                }
+                val intervalHours = getCheckIntervalHours(activity)
+                val checkIntervalMs = intervalHours * 60 * 60 * 1000L
+
+                val prefs = allowDiskReads { activity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE) }
                 val lastCheck = prefs.getLong(KEY_LAST_CHECK, 0L)
                 val now = System.currentTimeMillis()
-                if (now - lastCheck < CHECK_INTERVAL_MS) {
+                if (now - lastCheck < checkIntervalMs) {
                     return@launch
                 }
                 prefs.edit().putLong(KEY_LAST_CHECK, now).apply()
@@ -54,22 +88,10 @@ object FenixUpdater {
                     return@launch
                 }
 
-                val downloadUrl = releaseInfo.apkDownloadUrl ?: return@launch
-
-                // APK im Hintergrund laden (falls noch nicht vorhanden)
-                val updatesDir = File(activity.cacheDir, "updates")
-                if (!updatesDir.exists()) updatesDir.mkdirs()
-                val targetFile = File(updatesDir, "fenix-${releaseInfo.tagName}.apk")
-                val apkFile = if (targetFile.exists() && targetFile.length() > 5 * 1024 * 1024) {
-                    targetFile
-                } else {
-                    downloadApk(activity, downloadUrl, releaseInfo.tagName) { /* silent */ }
-                }
-
                 withContext(Dispatchers.Main) {
                     if (!activity.isFinishing && !activity.isDestroyed) {
                         prefs.edit().putString(KEY_LAST_PROMPTED_TAG, releaseInfo.tagName).apply()
-                        promptInstall(activity, apkFile)
+                        showUpdateDialog(activity, releaseInfo)
                     }
                 }
             } catch (_: Throwable) {
@@ -80,9 +102,10 @@ object FenixUpdater {
 
     private fun getInstalledVersionName(context: Context): String {
         return try {
-            context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: BuildConfig.VERSION_NAME
+            val full = context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: BuildConfig.VERSION_NAME
+            full.substringBefore(" ").trim()
         } catch (_: Throwable) {
-            BuildConfig.VERSION_NAME
+            BuildConfig.VERSION_NAME.substringBefore(" ").trim()
         }
     }
 

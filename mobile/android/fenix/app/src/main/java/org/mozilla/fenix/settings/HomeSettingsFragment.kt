@@ -80,6 +80,33 @@ class HomeSettingsFragment : PreferenceFragmentCompat(), SystemInsetsPaddedFragm
             onPreferenceChangeListener = createMetricPreferenceChangeListener("contile")
         }
 
+        findPreference<androidx.preference.SeekBarPreference>(getString(R.string.pref_key_top_sites_size))?.apply {
+            value = org.mozilla.fenix.custom.CustomTopSitesSize.getSize(requireContext())
+            onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
+                val size = (newValue as? Int) ?: return@OnPreferenceChangeListener false
+                org.mozilla.fenix.custom.CustomTopSitesSize.setSize(requireContext(), size)
+                true
+            }
+        }
+
+        findPreference<androidx.preference.SeekBarPreference>(getString(R.string.pref_key_top_sites_spacing))?.apply {
+            value = org.mozilla.fenix.custom.CustomTopSitesSize.getSpacing(requireContext())
+            onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
+                val spacing = (newValue as? Int) ?: return@OnPreferenceChangeListener false
+                org.mozilla.fenix.custom.CustomTopSitesSize.setSpacing(requireContext(), spacing)
+                true
+            }
+        }
+
+        findPreference<androidx.preference.SeekBarPreference>(getString(R.string.pref_key_top_sites_font_size))?.apply {
+            value = org.mozilla.fenix.custom.CustomTopSitesSize.getFontSize(requireContext())
+            onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
+                val fontSize = (newValue as? Int) ?: return@OnPreferenceChangeListener false
+                org.mozilla.fenix.custom.CustomTopSitesSize.setFontSize(requireContext(), fontSize)
+                true
+            }
+        }
+
         requirePreference<SwitchPreferenceCompat>(R.string.pref_key_privacy_report).apply {
             if (fenixSettings.longfoxEnabled) title = resources.getString(R.string.help_catch_trackers)
             isChecked = fenixSettings.showPrivacyReportFeature

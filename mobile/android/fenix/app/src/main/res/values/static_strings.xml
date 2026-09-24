@@ -10,6 +10,20 @@
     <string name="pref_key_check_updates" translatable="false">pref_key_check_updates</string>
     <string name="preferences_check_updates" translatable="false">Nach Updates suchen</string>
     <string name="preferences_check_updates_summary" translatable="false">Prüft auf GitHub nach neuen Fenix Releases</string>
+    <string name="pref_key_auto_update_check" translatable="false">pref_key_auto_update_check</string>
+    <string name="preferences_auto_update_check" translatable="false">Automatische Update-Prüfung</string>
+    <string name="preferences_auto_update_check_summary" translatable="false">Sucht im Hintergrund regelmäßig nach neuen Versionen</string>
+    <string name="pref_key_update_check_interval" translatable="false">pref_key_update_check_interval</string>
+    <string name="preferences_update_check_interval" translatable="false">Prüfintervall (Stunden)</string>
+    <string name="preferences_update_check_interval_summary" translatable="false">Häufigkeit der automatischen Update-Prüfung (1–24 Std.)</string>
+    <string name="preferences_top_sites_size" translatable="false">Shortcut-Größe</string>
+    <string name="preferences_top_sites_size_summary" translatable="false">Symbolgröße der Verknüpfungen (32 bis 72 dp)</string>
+    <string name="pref_key_top_sites_spacing" translatable="false">pref_key_top_sites_spacing</string>
+    <string name="preferences_top_sites_spacing" translatable="false">Shortcut-Abstand</string>
+    <string name="preferences_top_sites_spacing_summary" translatable="false">Horizontaler Abstand zwischen den Verknüpfungen (0 bis 40 dp)</string>
+    <string name="pref_key_top_sites_font_size" translatable="false">pref_key_top_sites_font_size</string>
+    <string name="preferences_top_sites_font_size" translatable="false">Shortcut-Schriftgröße</string>
+    <string name="preferences_top_sites_font_size_summary" translatable="false">Schriftgröße der Beschriftungen (8 bis 16 sp)</string>
 
     <!-- Preference for developers -->
     <string name="preference_leakcanary" translatable="false">LeakCanary</string>

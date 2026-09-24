@@ -57,7 +57,7 @@ internal data class TopSiteState(
                         colors = TopSiteColors.colors(wallpaperState = appState.wallpaperState),
                         isAddShortcutEnabled = isAddShortcutEnabled,
                         showExpandToggle = settings.showMoreShortcuts && (hasHiddenShortcuts || hasHiddenAddShortcut),
-                        showShortcutsLibraryButton = !settings.showMoreShortcuts,
+                        showShortcutsLibraryButton = !settings.showMoreShortcuts && (hasHiddenShortcuts || hasHiddenAddShortcut),
                     )
                 }
         }

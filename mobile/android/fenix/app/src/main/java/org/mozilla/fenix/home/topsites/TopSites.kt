@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -77,7 +78,7 @@ import org.mozilla.fenix.wallpapers.WallpaperState
 /** The size of a top site item. */
 const val TOP_SITES_ITEM_SIZE = 84
 
-internal const val TOP_SITES_TO_SHOW = 8
+internal const val TOP_SITES_TO_SHOW = 16
 internal const val TOP_SITES_PER_ROW = 4
 private const val TOP_SITES_ROW_WIDTH = TOP_SITES_PER_ROW * TOP_SITES_ITEM_SIZE
 internal const val TOP_SITES_FAVICON_CARD_SIZE = 60
@@ -272,6 +273,13 @@ private fun TopSitesGrid(
     onAddShortcutClicked: () -> Unit,
     onMoveTopSiteClicked: ((TopSite, Boolean) -> Unit)? = null,
 ) {
+    val context = LocalContext.current
+    val cardSize = org.mozilla.fenix.custom.CustomTopSitesSize.getSize(context)
+    val spacing = org.mozilla.fenix.custom.CustomTopSitesSize.getSpacing(context)
+    val fontSize = org.mozilla.fenix.custom.CustomTopSitesSize.getFontSize(context)
+    val itemSize = (cardSize + spacing + 24).coerceIn(56, 96)
+    val gap = (spacing / 4).coerceAtLeast(2)
+
     val topSiteRows = topSites.chunked(TOP_SITES_PER_ROW)
     val addShortcutInCurrentRow =
         showAddShortcut && topSiteRows.isNotEmpty() && topSiteRows.last().size < TOP_SITES_PER_ROW
@@ -304,6 +312,10 @@ private fun TopSitesGrid(
                     onTopSitesItemBound = onTopSitesItemBound,
                     onAddShortcutClicked = onAddShortcutClicked,
                     onMoveTopSiteClicked = onMoveTopSiteClicked,
+                    cardSize = cardSize,
+                    itemSize = itemSize,
+                    spacing = spacing,
+                    fontSize = fontSize,
                 )
 
                 if (!isLastRow || addShortcutInNewRow) {
@@ -312,10 +324,17 @@ private fun TopSitesGrid(
             }
 
             if (addShortcutInNewRow) {
-                Row(modifier = Modifier.defaultMinSize(minWidth = TOP_SITES_ROW_WIDTH.dp)) {
+                val rowWidth = (itemSize * TOP_SITES_PER_ROW + gap * (TOP_SITES_PER_ROW - 1)).dp
+                Row(
+                    modifier = Modifier.width(rowWidth),
+                    horizontalArrangement = Arrangement.spacedBy(gap.dp, Alignment.Start),
+                ) {
                     AddShortcutItem(
                         topSiteColors = topSiteColors,
                         onClick = onAddShortcutClicked,
+                        cardSize = cardSize,
+                        itemSize = itemSize,
+                        fontSize = fontSize,
                     )
                 }
             }
@@ -341,8 +360,17 @@ private fun TopSiteGridRow(
     onTopSitesItemBound: () -> Unit,
     onAddShortcutClicked: () -> Unit,
     onMoveTopSiteClicked: ((TopSite, Boolean) -> Unit)? = null,
+    cardSize: Int = org.mozilla.fenix.custom.CustomTopSitesSize.DEFAULT_SIZE,
+    spacing: Int = org.mozilla.fenix.custom.CustomTopSitesSize.DEFAULT_SPACING,
+    fontSize: Int = org.mozilla.fenix.custom.CustomTopSitesSize.DEFAULT_FONT_SIZE,
+    itemSize: Int = (cardSize + spacing + 24).coerceIn(56, 96),
 ) {
-    Row(modifier = Modifier.defaultMinSize(minWidth = TOP_SITES_ROW_WIDTH.dp)) {
+    val gap = (spacing / 4).coerceAtLeast(2)
+    val rowWidth = (itemSize * TOP_SITES_PER_ROW + gap * (TOP_SITES_PER_ROW - 1)).dp
+    Row(
+        modifier = Modifier.width(rowWidth),
+        horizontalArrangement = Arrangement.spacedBy(gap.dp, Alignment.Start),
+    ) {
         items.forEachIndexed { position, topSite ->
             val siteIndex = allSites.indexOfFirst { it.url == topSite.url }
             val canMoveLeft = siteIndex > 0
@@ -367,6 +395,9 @@ private fun TopSiteGridRow(
                 onTopSiteLongClick = onTopSiteLongClick,
                 onTopSiteImpression = onTopSiteImpression,
                 onTopSitesItemBound = onTopSitesItemBound,
+                cardSize = cardSize,
+                itemSize = itemSize,
+                fontSize = fontSize,
             )
         }
 
@@ -374,6 +405,9 @@ private fun TopSiteGridRow(
             AddShortcutItem(
                 topSiteColors = topSiteColors,
                 onClick = onAddShortcutClicked,
+                cardSize = cardSize,
+                itemSize = itemSize,
+                fontSize = fontSize,
             )
         }
     }
@@ -446,6 +480,9 @@ fun TopSiteItem(
     onTopSiteLongClick: (TopSite) -> Unit,
     onTopSiteImpression: (TopSite.Provided, Int) -> Unit,
     onTopSitesItemBound: () -> Unit,
+    cardSize: Int = org.mozilla.fenix.custom.CustomTopSitesSize.DEFAULT_SIZE,
+    itemSize: Int = (cardSize + 28).coerceAtLeast(64),
+    fontSize: Int = org.mozilla.fenix.custom.CustomTopSitesSize.DEFAULT_FONT_SIZE,
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
     val onLongClick = {
@@ -473,7 +510,7 @@ fun TopSiteItem(
                         indication = null,
                         onRightClick = onLongClick,
                     )
-                    .width(TOP_SITES_ITEM_SIZE.dp),
+                    .width(itemSize.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(modifier = Modifier.height(4.dp))
@@ -485,13 +522,14 @@ fun TopSiteItem(
                 TopSiteFaviconCard(
                     topSite = topSite,
                     backgroundColor = topSiteColors.faviconCardBackgroundColor,
+                    cardSize = cardSize,
                 )
             }
 
             Spacer(modifier = Modifier.height(6.dp))
 
             Row(
-                modifier = Modifier.width(TOP_SITES_ITEM_SIZE.dp),
+                modifier = Modifier.width(itemSize.dp),
                 horizontalArrangement = Arrangement.Absolute.Center,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -500,22 +538,26 @@ fun TopSiteItem(
                         Modifier.semantics {
                                 testTagsAsResourceId = true
                             }
-                            .padding(horizontal = 4.dp)
+                            .padding(horizontal = 2.dp)
                             .testTag(TopSitesTestTag.TOP_SITE_TITLE),
                     text = topSite.title ?: topSite.url,
                     color = topSiteColors.titleTextColor,
                     textAlign = TextAlign.Center,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = topSite.getMaxLinesForTitle(),
-                    style = FirefoxTheme.typography.caption.copy(fontWeight = FontWeight.W700),
+                    style = FirefoxTheme.typography.caption.copy(
+                        fontSize = fontSize.sp,
+                        lineHeight = (fontSize + 3).sp,
+                        fontWeight = FontWeight.W700,
+                    ),
                 )
             }
 
             Text(
                 text = if (topSite is TopSite.Provided) stringResource(id = R.string.top_sites_sponsored_label) else "",
-                modifier = Modifier.width(TOP_SITES_ITEM_SIZE.dp),
+                modifier = Modifier.width(itemSize.dp),
                 color = topSiteColors.sponsoredTextColor,
-                fontSize = 10.sp,
+                fontSize = (fontSize - 2).coerceAtLeast(8).sp,
                 textAlign = TextAlign.Center,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
@@ -552,6 +594,7 @@ fun TopSiteItem(
 private fun TopSiteFaviconCard(
     topSite: TopSite,
     backgroundColor: Color,
+    cardSize: Int = org.mozilla.fenix.custom.CustomTopSitesSize.DEFAULT_SIZE,
 ) {
     Card(
         modifier =
@@ -559,7 +602,7 @@ private fun TopSiteFaviconCard(
                     testTagsAsResourceId = true
                     testTag = TOP_SITE_CARD_FAVICON
                 }
-                .size(TOP_SITES_FAVICON_CARD_SIZE.dp),
+                .size(cardSize.dp),
         shape = CircleShape,
         colors = CardDefaults.cardColors(containerColor = backgroundColor),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
@@ -568,13 +611,16 @@ private fun TopSiteFaviconCard(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center,
         ) {
-            TopSiteFavicon(topSite = topSite)
+            TopSiteFavicon(topSite = topSite, cardSize = cardSize)
         }
     }
 }
 
 @Composable
-private fun TopSiteFavicon(topSite: TopSite) {
+private fun TopSiteFavicon(
+    topSite: TopSite,
+    cardSize: Int = org.mozilla.fenix.custom.CustomTopSitesSize.DEFAULT_SIZE,
+) {
     val context = LocalContext.current
     val iconVersion = org.mozilla.fenix.custom.CustomTopSitesIcons.iconVersion
     val customBitmap = remember(topSite.url, iconVersion) {
@@ -601,7 +647,7 @@ private fun TopSiteFavicon(topSite: TopSite) {
             is TopSitesFavicon.ImageUrl ->
                 Favicon(
                     url = topSite.url,
-                    size = TOP_SITES_FAVICON_CARD_SIZE.dp,
+                    size = cardSize.dp,
                     modifier = Modifier.fillMaxSize().clip(CircleShape),
                     shape = CircleShape,
                     imageUrl = favicon.imageUrl,
@@ -609,7 +655,7 @@ private fun TopSiteFavicon(topSite: TopSite) {
 
             is TopSitesFavicon.Drawable ->
                 Favicon(
-                    size = TOP_SITES_FAVICON_CARD_SIZE.dp,
+                    size = cardSize.dp,
                     modifier = Modifier.fillMaxSize().clip(CircleShape),
                     shape = CircleShape,
                     imageResource = favicon.drawableResId,

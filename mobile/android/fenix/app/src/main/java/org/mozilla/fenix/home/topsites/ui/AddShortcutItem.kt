@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
@@ -36,6 +37,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import mozilla.components.ui.icons.R as iconsR
 import org.mozilla.fenix.R
 import org.mozilla.fenix.home.topsites.TOP_SITES_FAVICON_CARD_SIZE
@@ -48,6 +50,9 @@ import org.mozilla.fenix.theme.FirefoxTheme
 internal fun AddShortcutItem(
     topSiteColors: TopSiteColors,
     onClick: () -> Unit,
+    cardSize: Int = org.mozilla.fenix.custom.CustomTopSitesSize.DEFAULT_SIZE,
+    itemSize: Int = (cardSize + 28).coerceAtLeast(64),
+    fontSize: Int = org.mozilla.fenix.custom.CustomTopSitesSize.DEFAULT_FONT_SIZE,
 ) {
     Box(
         modifier =
@@ -64,13 +69,13 @@ internal fun AddShortcutItem(
                         role = Role.Button,
                         onClick = onClick,
                     )
-                    .width(TOP_SITES_ITEM_SIZE.dp),
+                    .width(itemSize.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(modifier = Modifier.height(4.dp))
 
             Card(
-                modifier = Modifier.size(TOP_SITES_FAVICON_CARD_SIZE.dp),
+                modifier = Modifier.size(cardSize.dp),
                 shape = CircleShape,
                 colors = CardDefaults.cardColors(containerColor = topSiteColors.faviconCardBackgroundColor),
                 elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
@@ -79,9 +84,11 @@ internal fun AddShortcutItem(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center,
                 ) {
+                    val plusSize = (cardSize * 0.45f).coerceIn(16f, 24f).dp
                     Icon(
                         painter = painterResource(iconsR.drawable.mozac_ic_plus_24),
                         contentDescription = null,
+                        modifier = Modifier.size(plusSize),
                     )
                 }
             }
@@ -89,7 +96,7 @@ internal fun AddShortcutItem(
             Spacer(modifier = Modifier.height(6.dp))
 
             Row(
-                modifier = Modifier.width(TOP_SITES_ITEM_SIZE.dp),
+                modifier = Modifier.width(itemSize.dp),
                 horizontalArrangement = Arrangement.Absolute.Center,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -98,13 +105,18 @@ internal fun AddShortcutItem(
                         Modifier.semantics {
                                 testTagsAsResourceId = true
                             }
+                            .padding(horizontal = 2.dp)
                             .testTag(TopSitesTestTag.ADD_SHORTCUT_TITLE),
                     text = stringResource(R.string.homepage_shortcuts_add_shortcut),
                     color = topSiteColors.titleTextColor,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 1,
                     textAlign = TextAlign.Center,
-                    style = FirefoxTheme.typography.caption.copy(fontWeight = FontWeight.W700),
+                    style = FirefoxTheme.typography.caption.copy(
+                        fontSize = fontSize.sp,
+                        lineHeight = (fontSize + 3).sp,
+                        fontWeight = FontWeight.W700,
+                    ),
                 )
             }
         }

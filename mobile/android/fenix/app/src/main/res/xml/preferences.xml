@@ -256,6 +256,25 @@
             android:title="@string/preferences_check_updates"
             android:summary="@string/preferences_check_updates_summary" />
 
+        <androidx.preference.SwitchPreferenceCompat
+            android:key="@string/pref_key_auto_update_check"
+            app:iconSpaceReserved="false"
+            android:defaultValue="true"
+            android:title="@string/preferences_auto_update_check"
+            android:summary="@string/preferences_auto_update_check_summary" />
+
+        <androidx.preference.SeekBarPreference
+            android:key="@string/pref_key_update_check_interval"
+            app:iconSpaceReserved="false"
+            android:dependency="@string/pref_key_auto_update_check"
+            android:defaultValue="4"
+            android:max="24"
+            app:min="1"
+            app:showSeekBarValue="true"
+            app:updatesContinuously="true"
+            android:title="@string/preferences_update_check_interval"
+            android:summary="@string/preferences_update_check_interval_summary" />
+
         <androidx.preference.Preference
             android:key="@string/pref_key_about"
             app:iconSpaceReserved="false"

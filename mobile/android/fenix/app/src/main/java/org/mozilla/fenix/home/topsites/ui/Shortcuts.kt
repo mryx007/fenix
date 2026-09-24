@@ -32,10 +32,17 @@ internal fun Shortcuts(
     showAddShortcut: Boolean = false,
     onAddShortcutClicked: () -> Unit,
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val cardSize = org.mozilla.fenix.custom.CustomTopSitesSize.getSize(context)
+    val spacing = org.mozilla.fenix.custom.CustomTopSitesSize.getSpacing(context)
+    val fontSize = org.mozilla.fenix.custom.CustomTopSitesSize.getFontSize(context)
+    val itemSize = (cardSize + spacing + 24).coerceIn(56, 96)
+    val gap = (spacing / 4).coerceAtLeast(2)
+
     LazyVerticalGrid(
-        columns = GridCells.Adaptive(minSize = TOP_SITES_ITEM_SIZE.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalArrangement = Arrangement.Center,
+        columns = GridCells.Adaptive(minSize = itemSize.dp),
+        verticalArrangement = Arrangement.spacedBy(gap.dp),
+        horizontalArrangement = Arrangement.spacedBy(gap.dp),
         modifier = Modifier.padding(16.dp),
     ) {
         topSites.forEachIndexed { position, topSite ->
@@ -67,6 +74,9 @@ internal fun Shortcuts(
                     onTopSiteLongClick = interactor::onTopSiteLongClicked,
                     onTopSiteImpression = interactor::onTopSiteImpression,
                     onTopSitesItemBound = {},
+                    cardSize = cardSize,
+                    itemSize = itemSize,
+                    fontSize = fontSize,
                 )
             }
         }
@@ -76,6 +86,9 @@ internal fun Shortcuts(
                 AddShortcutItem(
                     topSiteColors = topSiteColors,
                     onClick = onAddShortcutClicked,
+                    cardSize = cardSize,
+                    itemSize = itemSize,
+                    fontSize = fontSize,
                 )
             }
         }
