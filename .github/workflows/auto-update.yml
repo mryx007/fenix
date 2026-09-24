@@ -2,7 +2,7 @@ name: Fenix Auto Update & Build
 
 "on":
   schedule:
-    - cron: '0 3 * * *' # Täglich um 03:00 UTC
+    - cron: '23 2 * * *' # Täglich um 02:23 UTC (04:23 Sommer / 03:23 Winter deutscher Zeit)
   workflow_dispatch:
     inputs:
       force_build:
@@ -13,6 +13,7 @@ name: Fenix Auto Update & Build
 
 permissions:
   contents: write
+  actions: write
 
 jobs:
   update-and-release:
@@ -225,5 +226,16 @@ jobs:
           for r in $OLD_RELEASES; do
             echo "Entferne altes Release: $r"
             gh release delete "$r" --repo "$GITHUB_REPOSITORY" -y --cleanup-tag || true
+          done
+
+      - name: Cleanup Old Workflow Runs (Keep Last 3)
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          OLD_RUNS=$(gh run list --repo "$GITHUB_REPOSITORY" --limit 100 --json databaseId --jq '.[3:][].databaseId')
+          for run_id in $OLD_RUNS; do
+            echo "Lösche alten Workflow Run: $run_id"
+            gh run delete "$run_id" --repo "$GITHUB_REPOSITORY" || true
           done
 
