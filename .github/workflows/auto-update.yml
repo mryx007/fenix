@@ -199,11 +199,11 @@ jobs:
           fi
           echo "Gefundenes APK: $APK"
           
-          DATE=$(date +'%Y.%m.%d')
-          TARGET_APK="fenix-${DATE}.apk"
+          RELEASE_TAG="v$(date +'%Y.%m.%d.%H%M')"
+          TARGET_APK="fenix-${RELEASE_TAG#v}.apk"
           cp "$APK" "$TARGET_APK"
           echo "apk_path=$TARGET_APK" >> $GITHUB_OUTPUT
-          echo "release_tag=v${DATE}" >> $GITHUB_OUTPUT
+          echo "release_tag=$RELEASE_TAG" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
         if: steps.upstream-check.outputs.should_build == 'true'
