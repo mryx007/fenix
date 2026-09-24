@@ -176,7 +176,8 @@ jobs:
           cd mobile/android/fenix
           chmod +x gradlew
           export KEYSTORE_FILE="$PWD/fenix-release.keystore"
-          ./gradlew :app:assembleRelease -PdisableOptimization
+          DATE=$(date +'%Y.%m.%d')
+          ./gradlew :app:assembleRelease -PdisableOptimization -PversionName="$DATE"
 
       - name: Find and Package APK
         if: steps.upstream-check.outputs.should_build == 'true'

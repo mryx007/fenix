@@ -27,6 +27,7 @@ object FenixUpdater {
     private const val RELEASES_API_URL = "https://api.github.com/repos/$GITHUB_REPO/releases/latest"
     private const val PREFS_NAME = "fenix_updater_prefs"
     private const val KEY_LAST_CHECK = "last_check_timestamp"
+    private const val KEY_LAST_PROMPTED_TAG = "last_prompted_tag"
     private const val CHECK_INTERVAL_MS = 4 * 60 * 60 * 1000L // alle 4 Stunden im Hintergrund prüfen
 
     fun checkForUpdatesSilently(activity: Activity) {
@@ -42,7 +43,13 @@ object FenixUpdater {
 
                 val releaseInfo = fetchLatestRelease() ?: return@launch
 
-                val currentVersion = BuildConfig.VERSION_NAME
+                // Für denselben Release-Tag nicht wiederholt im Hintergrund nerven
+                val lastPromptedTag = prefs.getString(KEY_LAST_PROMPTED_TAG, null)
+                if (lastPromptedTag == releaseInfo.tagName) {
+                    return@launch
+                }
+
+                val currentVersion = getInstalledVersionName(activity)
                 if (!isVersionNewer(releaseInfo.version, currentVersion)) {
                     return@launch
                 }
@@ -61,12 +68,21 @@ object FenixUpdater {
 
                 withContext(Dispatchers.Main) {
                     if (!activity.isFinishing && !activity.isDestroyed) {
+                        prefs.edit().putString(KEY_LAST_PROMPTED_TAG, releaseInfo.tagName).apply()
                         promptInstall(activity, apkFile)
                     }
                 }
             } catch (_: Throwable) {
                 // Im Hintergrund still ignorieren
             }
+        }
+    }
+
+    private fun getInstalledVersionName(context: Context): String {
+        return try {
+            context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: BuildConfig.VERSION_NAME
+        } catch (_: Throwable) {
+            BuildConfig.VERSION_NAME
         }
     }
 
@@ -88,7 +104,7 @@ object FenixUpdater {
                     return@launch
                 }
 
-                val currentVersion = BuildConfig.VERSION_NAME
+                val currentVersion = getInstalledVersionName(activity)
                 val isNewer = isVersionNewer(releaseInfo.version, currentVersion)
 
                 if (isNewer) {
@@ -309,6 +325,7 @@ object FenixUpdater {
 
     internal fun isVersionNewer(remoteVersion: String, currentVersion: String): Boolean {
         if (remoteVersion.isBlank() || currentVersion.isBlank()) return false
+        if (remoteVersion.equals(currentVersion, ignoreCase = true)) return false
         val remoteParts = remoteVersion.split(".", "-").mapNotNull { it.toIntOrNull() }
         val currentParts = currentVersion.split(".", "-").mapNotNull { it.toIntOrNull() }
 
