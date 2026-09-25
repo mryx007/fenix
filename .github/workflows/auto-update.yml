@@ -1,6 +1,13 @@
 name: Fenix Auto Update & Build
 
 "on":
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'README.md'
+      - '**.md'
+      - '.gitignore'
   schedule:
     - cron: '23 2 * * *' # Täglich um 02:23 UTC (04:23 Sommer / 03:23 Winter deutscher Zeit)
   workflow_dispatch:
@@ -41,8 +48,8 @@ jobs:
           echo "Neuester Upstream Release Tag: $LATEST_TAG"
 
           SHOULD_BUILD="false"
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "Workflow manuell ausgelöst -> Build wird durchgeführt."
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "${{ github.event_name }}" = "push" ]; then
+            echo "Workflow durch ${{ github.event_name }} ausgelöst -> Build wird durchgeführt."
             SHOULD_BUILD="true"
           fi
 
