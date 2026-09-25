@@ -6,6 +6,7 @@ A customized, lightweight Android browser based on Firefox for Android, tailored
 
 ## Features
 
+- **Firefox-Vorschläge Priorisierung:** Firefox-Vorschläge (Chronik, Lesezeichen, offene Tabs) werden standardmäßig vor den Suchmaschinen-Vorschlägen (z. B. Google-Suche) in der Adressleiste platziert. Anpassbar über *Einstellungen → Suche* (Standard: aktiviert).
 - **Home-Button Long-Press:** Längerer Druck auf das Home-Symbol in der Navigationsleiste aktiviert sofort die Adressleiste und öffnet die Tastatur.
 - **Download-Badge Deaktivierbar:** Der Benachrichtigungspunkt am Download- und Menü-Symbol nach Downloads kann in den Einstellungen flexibel ein- und ausgeschaltet werden (Standard: aus).
 - **Startseiten-Navigation im selben Tab:** URLs und Verknüpfungen von der Startseite werden standardmäßig im aktuellen Tab geöffnet statt jedes Mal einen neuen Tab anzulegen (in den Einstellungen anpassbar).
@@ -23,6 +24,9 @@ A customized, lightweight Android browser based on Firefox for Android, tailored
 ## Changelog
 
 ### Latest Changes
+- **Firefox-Vorschläge zuerst anzeigen:**
+  - Schalter „Firefox-Vorschläge zuerst anzeigen“ in *Einstellungen → Suche* integriert (standardmäßig aktiviert).
+  - Zeigt lokale Chronik, Lesezeichen, offene Tabs und FxSuggest oberhalb der Websuche-Vorschläge (z. B. Google-Suche) in der Adressleiste an.
 - **Home-Button Schnellzugriff:**
   - Längerer Druck auf das Home-Symbol in der Navigationsleiste auf Webseiten aktiviert direkt die Adresszeile und öffnet die Tastatur.
 - **Download-Badge Einstellung:**
