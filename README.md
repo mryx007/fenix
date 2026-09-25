@@ -6,6 +6,7 @@ A customized, lightweight Android browser based on Firefox for Android, tailored
 
 ## Features
 
+- **Home-Button Long-Press:** Längerer Druck auf das Home-Symbol in der Navigationsleiste aktiviert sofort die Adressleiste und öffnet die Tastatur.
 - **Download-Badge Deaktivierbar:** Der Benachrichtigungspunkt am Download- und Menü-Symbol nach Downloads kann in den Einstellungen flexibel ein- und ausgeschaltet werden (Standard: aus).
 - **Startseiten-Navigation im selben Tab:** URLs und Verknüpfungen von der Startseite werden standardmäßig im aktuellen Tab geöffnet statt jedes Mal einen neuen Tab anzulegen (in den Einstellungen anpassbar).
 - **Added Configurable In-App Updater:** Background update checks can be toggled on/off with customizable check intervals (1–24 hours) and effortless one-tap installation prompt.
@@ -22,6 +23,8 @@ A customized, lightweight Android browser based on Firefox for Android, tailored
 ## Changelog
 
 ### Latest Changes
+- **Home-Button Schnellzugriff:**
+  - Längerer Druck auf das Home-Symbol in der Navigationsleiste auf Webseiten aktiviert direkt die Adresszeile und öffnet die Tastatur.
 - **Download-Badge Einstellung:**
   - Schalter „Download-Badge anzeigen“ in *Einstellungen → Downloads* ergänzt (standardmäßig deaktiviert).
   - Unterdrückt den Benachrichtigungspunkt am Download-Symbol im Menü sowie am 3-Punkte-Menü in der Symbolleiste.

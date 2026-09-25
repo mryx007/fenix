@@ -1406,6 +1406,7 @@ class BrowserToolbarMiddleware(
                     drawableResId = iconsR.drawable.mozac_ic_home_24,
                     contentDescription = R.string.browser_menu_homepage,
                     onClick = HomepageClicked(source),
+                    onLongClick = OriginClicked,
                 )
 
             ToolbarAction.Summarize ->
