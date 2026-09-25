@@ -6,6 +6,11 @@ A customized, lightweight Android browser based on Firefox for Android, tailored
 
 ## Features
 
+- **Single-Tab Navigation & Home-Integration:**
+  - Shortcuts und Suchen auf der Startseite nutzen standardmäßig den aktiven Tab weiter, anstatt für jeden Klick einen neuen Tab zu erzeugen. Neue Tabs entstehen wie bei Chrome gezielt über das `+` in der Tab-Übersicht.
+  - Zurücktaste und Home-Button navigieren den Tab zurück auf `about:home`, wodurch Webseiten im Hintergrund sauber entladen werden und kein visuelles Aufblitzen beim Laden anderer Shortcuts entsteht.
+  - **Dynamischer Vorwärts-Button auf dem Homescreen:** Kehrt man von einer Seite zur Startseite zurück, wird der Vorwärts-Button aktiv und bringt einen ohne Neuladen (aus dem BFCache) sofort wieder auf die Seite.
+  - **Home-Button auf dem Homescreen:** Ein Klick auf das Home-Symbol auf der Startseite aktiviert direkt die Adressleiste und öffnet die Tastatur.
 - **Firefox-Vorschläge Priorisierung:** Firefox-Vorschläge (Chronik, Lesezeichen, offene Tabs) werden standardmäßig vor den Suchmaschinen-Vorschlägen (z. B. Google-Suche) in der Adressleiste platziert. Anpassbar über *Einstellungen → Suche* (Standard: aktiviert).
 - **Home-Button Long-Press:** Längerer Druck auf das Home-Symbol in der Navigationsleiste aktiviert sofort die Adressleiste und öffnet die Tastatur.
 - **Download-Badge Deaktivierbar:** Der Benachrichtigungspunkt am Download- und Menü-Symbol nach Downloads kann in den Einstellungen flexibel ein- und ausgeschaltet werden (Standard: aus).
@@ -23,6 +28,11 @@ A customized, lightweight Android browser based on Firefox for Android, tailored
 ## Changelog
 
 ### Latest Changes
+- **Single-Tab Navigation & Nahtlose Startseiten-Integration:**
+  - Shortcuts und Suchen auf der Startseite nutzen automatisch den aktiven Tab weiter, anstatt unnötig neue Tabs zu öffnen (wie bei Chrome entstehen neue Tabs nur noch über `+` im Tab-Manager).
+  - Beim Klick auf das Home-Symbol sowie bei der Zurücktaste auf der letzten Webseite navigiert der Tab zu `about:home`. Webseiten werden im Hintergrund entladen, was das Aufblitzen alter Inhalte verhindert.
+  - **Vorwärts-Button auf dem Homescreen:** Erkennt den Seitenverlauf und bringt den Nutzer per Klick sofort und ohne Neuladen (BFCache) wieder auf die zuvor geöffnete Webseite.
+  - **Home-Button auf dem Homescreen:** Aktiviert direkt die Adressleiste und öffnet die Bildschirmtastatur.
 - **Firefox-Vorschläge zuerst anzeigen:**
   - Schalter „Firefox-Vorschläge zuerst anzeigen“ in *Einstellungen → Suche* integriert (standardmäßig aktiviert).
   - Zeigt lokale Chronik, Lesezeichen, offene Tabs und FxSuggest oberhalb der Websuche-Vorschläge (z. B. Google-Suche) in der Adressleiste an.

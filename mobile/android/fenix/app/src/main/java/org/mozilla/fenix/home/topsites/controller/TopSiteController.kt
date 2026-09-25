@@ -27,8 +27,10 @@ import kotlinx.coroutines.launch
 import mozilla.components.browser.state.search.SearchEngine
 import mozilla.components.browser.state.state.availableSearchEngines
 import mozilla.components.browser.state.state.searchEngines
+import mozilla.components.browser.state.selector.selectedTab
 import mozilla.components.browser.state.state.selectedOrDefaultSearchEngine
 import mozilla.components.browser.state.store.BrowserStore
+import mozilla.components.concept.engine.utils.ABOUT_HOME_URL
 import mozilla.components.feature.tabs.TabsUseCases
 import mozilla.components.feature.top.sites.TopSite
 import mozilla.components.feature.top.sites.TopSitesUseCases
@@ -381,11 +383,15 @@ class DefaultTopSiteController(
                 )
             }
 
-        if (settings.enableHomepageAsNewTab) {
+        val isPrivate = appStore.state.mode.isPrivate
+        val selectedTab = store.state.selectedTab?.takeIf { it.content.private == isPrivate }
+        val isHomepageTab = selectedTab?.content?.url == ABOUT_HOME_URL
+
+        if (settings.enableHomepageAsNewTab || isHomepageTab) {
             fenixBrowserUseCases.loadUrlOrSearch(
                 searchTermOrURL = appendSearchAttributionToUrlIfNeeded(topSite.url),
                 newTab = false,
-                private = false,
+                private = isPrivate,
             )
         } else {
             val existingTabForUrl =

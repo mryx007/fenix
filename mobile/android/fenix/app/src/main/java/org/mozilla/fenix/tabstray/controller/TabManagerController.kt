@@ -277,17 +277,8 @@ class DefaultTabManagerController(
         val startTime = profiler?.getProfilerTime()
         browsingModeManager.mode = BrowsingMode.fromBoolean(isPrivate)
 
-        if (settings.enableHomepageAsNewTab) {
-            fenixBrowserUseCases.addNewHomepageTab(private = isPrivate)
-            handleNavigateToHome()
-        } else {
-            navController.popBackStack()
-            navController.navigate(
-                TabManagementFragmentDirections.actionGlobalHome(
-                    focusOnAddressBar = !settings.enableHomepageTrendingRecentSearch
-                )
-            )
-        }
+        fenixBrowserUseCases.addNewHomepageTab(private = isPrivate)
+        handleNavigateToHome()
 
         TabsTray.closed.record(NoExtras())
         profiler?.addMarker(

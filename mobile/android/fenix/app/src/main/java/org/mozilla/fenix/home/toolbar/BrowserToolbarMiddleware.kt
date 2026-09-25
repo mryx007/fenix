@@ -16,8 +16,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import mozilla.components.browser.state.action.EngineAction
 import mozilla.components.browser.state.search.SearchEngine
 import mozilla.components.browser.state.selector.getNormalOrPrivateTabs
+import mozilla.components.browser.state.selector.selectedTab
 import mozilla.components.browser.state.state.selectedOrDefaultSearchEngine
 import mozilla.components.browser.state.store.BrowserStore
 import mozilla.components.compose.browser.toolbar.concept.Action
@@ -75,7 +77,9 @@ import org.mozilla.fenix.components.menu.MenuAccessPoint
 import org.mozilla.fenix.components.usecases.FenixBrowserUseCases
 import org.mozilla.fenix.ext.nav
 import org.mozilla.fenix.home.HomeFragmentDirections
+import org.mozilla.fenix.home.toolbar.DisplayActions.BackClicked
 import org.mozilla.fenix.home.toolbar.DisplayActions.FakeClicked
+import org.mozilla.fenix.home.toolbar.DisplayActions.ForwardClicked
 import org.mozilla.fenix.home.toolbar.DisplayActions.MenuClicked
 import org.mozilla.fenix.home.toolbar.DisplayActions.VoiceSearchClicked
 import org.mozilla.fenix.home.toolbar.PageOriginInteractions.OriginClicked
@@ -99,6 +103,10 @@ internal sealed class DisplayActions : BrowserToolbarEvent {
     data class MenuClicked(override val source: Source) : DisplayActions()
 
     data object FakeClicked : DisplayActions()
+
+    data object BackClicked : DisplayActions()
+
+    data object ForwardClicked : DisplayActions()
 
     data object VoiceSearchClicked : DisplayActions()
 }
@@ -173,6 +181,7 @@ class BrowserToolbarMiddleware(
                 }
                 updateToolbarActionsBasedOnOrientation(store)
                 updateTabsCount(store)
+                observeBackForwardState(store)
                 updateMenuHighlight(store)
 
                 observeTranslationsFeatureAvailabilityUpdates(store)
@@ -196,6 +205,26 @@ class BrowserToolbarMiddleware(
                     HomeFragmentDirections.actionGlobalMenuDialogFragment(accesspoint = MenuAccessPoint.Home),
                 )
                 removeMenuButtonHighlight()
+                next(action)
+            }
+
+            is BackClicked -> {
+                browserStore.state.selectedTab?.let { tab ->
+                    browserStore.dispatch(EngineAction.GoBackAction(tab.id))
+                    navController.navigate(HomeFragmentDirections.actionGlobalBrowser(null))
+                }
+                next(action)
+            }
+
+            is ForwardClicked -> {
+                browserStore.state.selectedTab?.let { tab ->
+                    if (tab.content.canGoForward) {
+                        browserStore.dispatch(EngineAction.GoForwardAction(tab.id))
+                    } else if (tab.content.canGoBack) {
+                        browserStore.dispatch(EngineAction.GoBackAction(tab.id))
+                    }
+                    navController.navigate(HomeFragmentDirections.actionGlobalBrowser(null))
+                }
                 next(action)
             }
 
@@ -488,6 +517,18 @@ class BrowserToolbarMiddleware(
         }
     }
 
+    private fun observeBackForwardState(store: Store<BrowserToolbarState, BrowserToolbarAction>) {
+        browserStore.observeWhileActive {
+            distinctUntilChangedBy { state ->
+                val content = state.selectedTab?.content
+                content?.canGoBack to content?.canGoForward
+            }
+                .collect {
+                    updateNavigationActions(store)
+                }
+        }
+    }
+
     private fun updateMenuHighlight(store: Store<BrowserToolbarState, BrowserToolbarAction>) {
         appStore.observeWhileActive {
             distinctUntilChangedBy { state ->
@@ -630,8 +671,8 @@ class BrowserToolbarMiddleware(
                 ActionButtonRes(
                     drawableResId = iconsR.drawable.mozac_ic_home_24,
                     contentDescription = R.string.browser_menu_homepage,
-                    state = ActionButton.State.DISABLED,
-                    onClick = FakeClicked,
+                    state = ActionButton.State.DEFAULT,
+                    onClick = OriginClicked,
                 )
 
             HomeToolbarAction.FakeBack ->
@@ -642,13 +683,17 @@ class BrowserToolbarMiddleware(
                     onClick = FakeClicked,
                 )
 
-            HomeToolbarAction.FakeForward ->
+            HomeToolbarAction.FakeForward -> {
+                val hasPageHistory = browserStore.state.selectedTab?.content?.let {
+                    it.canGoForward || it.canGoBack
+                } == true
                 ActionButtonRes(
                     drawableResId = iconsR.drawable.mozac_ic_forward_24,
                     contentDescription = R.string.browser_menu_forward,
-                    state = ActionButton.State.DISABLED,
-                    onClick = FakeClicked,
+                    state = if (hasPageHistory) ActionButton.State.DEFAULT else ActionButton.State.DISABLED,
+                    onClick = if (hasPageHistory) ForwardClicked else FakeClicked,
                 )
+            }
 
             HomeToolbarAction.FakeSummarize ->
                 ActionButtonRes(

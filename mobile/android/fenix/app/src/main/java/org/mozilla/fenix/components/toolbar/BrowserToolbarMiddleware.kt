@@ -659,12 +659,11 @@ class BrowserToolbarMiddleware(
             }
 
             is HomepageClicked -> {
-                if (settings.enableHomepageAsNewTab) {
+                if (browserStore.state.selectedTab != null) {
                     useCases.fenixBrowserUseCases.navigateToHomepage()
-                } else {
-                    val directions = BrowserFragmentDirections.actionGlobalHome()
-                    navController.navigate(directions)
                 }
+                val directions = BrowserFragmentDirections.actionGlobalHome()
+                navController.navigate(directions)
                 next(action)
             }
 

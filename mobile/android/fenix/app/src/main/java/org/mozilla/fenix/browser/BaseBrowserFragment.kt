@@ -2051,11 +2051,18 @@ abstract class BaseBrowserFragment :
 
     @CallSuper
     override fun onBackPressed(): Boolean {
-        return findInPageIntegration.onBackPressed() ||
+        if (findInPageIntegration.onBackPressed() ||
             fullScreenFeature.onBackPressed() ||
             promptsFeature.onBackPressed() ||
             sessionFeature.onBackPressed() ||
             lastTabFeature.onBackPressed()
+        ) {
+            return true
+        }
+
+        requireComponents.useCases.fenixBrowserUseCases.navigateToHomepage()
+        findNavController().navigate(BrowserFragmentDirections.actionGlobalHome())
+        return true
     }
 
     @CallSuper
