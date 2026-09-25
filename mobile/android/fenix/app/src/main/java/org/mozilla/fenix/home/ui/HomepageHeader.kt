@@ -46,15 +46,9 @@ fun HomepageHeader(
     browsingMode: BrowsingMode,
     browsingModeChanged: (BrowsingMode) -> Unit,
 ) {
-    // In normal mode the wordmark and private-browsing button follow the wallpaper text color; in
-    // private mode there is no wallpaper, so the wordmark is untinted and the button uses its
-    // dedicated private-mode icon color.
-    val wordmarkTextColor =
-        if (browsingMode.isPrivate) {
-            null
-        } else {
-            WallpaperTheme.onWallpaper
-        }
+    // In normal mode the private-browsing button follows the wallpaper text color; in
+    // private mode there is no wallpaper, so the button uses its dedicated private-mode icon color.
+
     val privateBrowsingButtonColor =
         if (browsingMode.isPrivate) {
             colorResource(getAttr(iconsR.attr.mozac_ic_private_mode_circle_fill_icon_color))
@@ -66,13 +60,9 @@ fun HomepageHeader(
         modifier =
             Modifier.fillMaxWidth()
                 .wrapContentHeight()
-                .padding(start = 16.dp, end = 16.dp, top = 18.dp, bottom = 32.dp),
+                .padding(start = 16.dp, end = 16.dp, top = 18.dp, bottom = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        WordmarkLogo()
-
-        WordmarkText(wordmarkTextColor)
-
         Spacer(modifier = Modifier.weight(1f))
 
         PrivateBrowsingButton(

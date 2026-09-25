@@ -86,15 +86,6 @@ fun ExperimentalHomepageHeader(
                 )
             }
         }
-
-        Column(
-            modifier = Modifier.fillMaxWidth().wrapContentHeight().padding(all = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Spacer(modifier = Modifier.height(28.dp))
-
-            WordmarkAndLogo(wordmarkTextColor = WallpaperTheme.onWallpaper)
-        }
     }
 }
 
@@ -114,19 +105,6 @@ fun ExperimentalPrivateHomepageHeader(onHomeTapped: () -> Unit) {
     }
 }
 
-@Composable
-private fun WordmarkAndLogo(
-    wordmarkTextColor: Color?,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        WordmarkLogo()
-        WordmarkText(wordmarkTextColor)
-    }
-}
 
 @Composable
 private fun PrivateModeButton(onClick: () -> Unit) {
