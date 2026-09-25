@@ -928,7 +928,7 @@ class BrowserToolbarMiddleware(
     private fun buildProgressBar(progress: Int = 0) = ProgressBarConfig(progress)
 
     private fun openNewTab(browsingMode: BrowsingMode) {
-        if (settings.openInSameTab || settings.enableHomepageAsNewTab) {
+        if (settings.enableHomepageAsNewTab) {
             useCases.fenixBrowserUseCases.addNewHomepageTab(private = browsingMode.isPrivate)
         } else {
             val focusOnAddressBar = !settings.enableHomepageSearchBar && !settings.enableHomepageTrendingRecentSearch

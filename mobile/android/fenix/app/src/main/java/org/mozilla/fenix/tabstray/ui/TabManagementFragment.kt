@@ -654,7 +654,7 @@ class TabManagementFragment : Fragment() {
                         config =
                             restoredState.config.copy(
                                 displayTabsInGrid = settings.gridTabView,
-                                homepageAsNewTabEnabled = settings.enableHomepageAsNewTab || settings.openInSameTab,
+                                homepageAsNewTabEnabled = settings.enableHomepageAsNewTab,
                                 tabGroupsEnabled = settings.tabGroupsEnabled,
                             )
                     ) ?: createInitialState(args, settings),
@@ -725,7 +725,7 @@ class TabManagementFragment : Fragment() {
                     tabGroupsDragAndDropEnabled = settings.tabGroupsDragAndDropEnabled,
                     tabGroupsLiveReorderEnabled = settings.tabGroupsLiveReorderEnabled,
                     tabGroupsOnboardingEnabled = settings.tabGroupsOnboardingEnabled,
-                    homepageAsNewTabEnabled = settings.enableHomepageAsNewTab || settings.openInSameTab,
+                    homepageAsNewTabEnabled = settings.enableHomepageAsNewTab,
                     displayTabsInGrid = settings.gridTabView,
                     isInDebugMode = Config.channel.isDebug || requireComponents.settings.showSecretDebugMenuThisSession,
                     showTabAutoCloseBanner =

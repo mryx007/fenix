@@ -107,15 +107,6 @@ class HomeSettingsFragment : PreferenceFragmentCompat(), SystemInsetsPaddedFragm
             }
         }
 
-        findPreference<SwitchPreferenceCompat>(getString(R.string.pref_key_open_in_same_tab))?.apply {
-            isChecked = fenixSettings.openInSameTab
-            onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
-                val enabled = newValue as? Boolean ?: return@OnPreferenceChangeListener false
-                fenixSettings.openInSameTab = enabled
-                true
-            }
-        }
-
         requirePreference<SwitchPreferenceCompat>(R.string.pref_key_privacy_report).apply {
             if (fenixSettings.longfoxEnabled) title = resources.getString(R.string.help_catch_trackers)
             isChecked = fenixSettings.showPrivacyReportFeature

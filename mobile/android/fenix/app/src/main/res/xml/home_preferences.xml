@@ -57,12 +57,6 @@
       android:title="@string/customize_toggle_weather" />
 
     <androidx.preference.SwitchPreferenceCompat
-        android:defaultValue="true"
-        android:key="@string/pref_key_open_in_same_tab"
-        android:title="@string/preferences_enable_homepage_as_new_tab"
-        android:summary="@string/preferences_enable_homepage_as_new_tab_summary" />
-
-    <androidx.preference.SwitchPreferenceCompat
         android:key="@string/pref_key_privacy_report"
         android:title="@string/customize_toggle_privacy_report" />
 

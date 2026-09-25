@@ -9,7 +9,6 @@ A customized, lightweight Android browser based on Firefox for Android, tailored
 - **Firefox-Vorschläge Priorisierung:** Firefox-Vorschläge (Chronik, Lesezeichen, offene Tabs) werden standardmäßig vor den Suchmaschinen-Vorschlägen (z. B. Google-Suche) in der Adressleiste platziert. Anpassbar über *Einstellungen → Suche* (Standard: aktiviert).
 - **Home-Button Long-Press:** Längerer Druck auf das Home-Symbol in der Navigationsleiste aktiviert sofort die Adressleiste und öffnet die Tastatur.
 - **Download-Badge Deaktivierbar:** Der Benachrichtigungspunkt am Download- und Menü-Symbol nach Downloads kann in den Einstellungen flexibel ein- und ausgeschaltet werden (Standard: aus).
-- **Startseiten-Navigation im selben Tab:** URLs und Verknüpfungen von der Startseite werden standardmäßig im aktuellen Tab geöffnet statt jedes Mal einen neuen Tab anzulegen (in den Einstellungen anpassbar).
 - **Added Configurable In-App Updater:** Background update checks can be toggled on/off with customizable check intervals (1–24 hours) and effortless one-tap installation prompt.
 - **Added Shortcut Customization:** Preference sliders for shortcut icon size (32–72 dp), spacing (0–40 dp), and font size (8–16 sp) with dynamic width adaptation to prevent unwanted word wrapping.
 - **Expanded Homepage Shortcuts:** Displays up to 16 shortcuts on the homepage (4 per row) with left-aligned incomplete rows and intelligent "Show all" visibility.
@@ -32,9 +31,6 @@ A customized, lightweight Android browser based on Firefox for Android, tailored
 - **Download-Badge Einstellung:**
   - Schalter „Download-Badge anzeigen“ in *Einstellungen → Downloads* ergänzt (standardmäßig deaktiviert).
   - Unterdrückt den Benachrichtigungspunkt am Download-Symbol im Menü sowie am 3-Punkte-Menü in der Symbolleiste.
-- **Startseiten-Navigation im selben Tab:**
-  - Schalter „Links und Verknüpfungen im selben Tab öffnen“ in *Einstellungen → Startseite* ergänzt (standardmäßig aktiviert).
-  - Verhindert das unabsichtliche Öffnen unzähliger neuer Tabs beim Aufrufen von URLs oder Verknüpfungen von der Startseite.
 - **Update-Prüfung & GitHub Actions Fix:**
   - `versionName` und Release-Tag im Build-Workflow synchronisiert, sodass keine fehlerhaften Update-Meldungen mehr in Endlosschleife erscheinen.
 - **Shortcuts Customization & Grid Layout:**

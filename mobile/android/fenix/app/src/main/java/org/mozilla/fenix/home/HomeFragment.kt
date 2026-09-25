@@ -943,7 +943,7 @@ class HomeFragment : Fragment() {
                         settings = requireComponents.settings,
                     ),
                 onAddTabClick = {
-                    if (requireComponents.settings.openInSameTab || requireComponents.settings.enableHomepageAsNewTab) {
+                    if (requireComponents.settings.enableHomepageAsNewTab) {
                         requireComponents.useCases.fenixBrowserUseCases.addNewHomepageTab(
                             private = (requireActivity() as HomeActivity).browsingModeManager.mode.isPrivate
                         )

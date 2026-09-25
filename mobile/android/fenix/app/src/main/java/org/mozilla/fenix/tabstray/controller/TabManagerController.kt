@@ -277,7 +277,7 @@ class DefaultTabManagerController(
         val startTime = profiler?.getProfilerTime()
         browsingModeManager.mode = BrowsingMode.fromBoolean(isPrivate)
 
-        if (settings.openInSameTab || settings.enableHomepageAsNewTab) {
+        if (settings.enableHomepageAsNewTab) {
             fenixBrowserUseCases.addNewHomepageTab(private = isPrivate)
             handleNavigateToHome()
         } else {
