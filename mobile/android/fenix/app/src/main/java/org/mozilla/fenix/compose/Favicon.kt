@@ -186,6 +186,5 @@ private fun FaviconPreview(@PreviewParameter(PreviewThemeProvider::class) theme:
 private fun Dp.toIconRequestSize() =
     when {
         value <= dimensionResource(IconRequest.Size.DEFAULT.dimen).value -> IconRequest.Size.DEFAULT
-        value <= dimensionResource(IconRequest.Size.LAUNCHER.dimen).value -> IconRequest.Size.LAUNCHER
-        else -> IconRequest.Size.LAUNCHER_ADAPTIVE
+        else -> IconRequest.Size.LAUNCHER
     }
