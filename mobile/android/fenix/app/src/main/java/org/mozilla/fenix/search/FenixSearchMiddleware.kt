@@ -19,6 +19,8 @@ import kotlinx.coroutines.launch
 import mozilla.components.browser.state.action.AwesomeBarAction
 import mozilla.components.browser.state.search.DefaultSearchEngineProvider
 import mozilla.components.browser.state.search.SearchEngine
+import mozilla.components.browser.state.selector.getNormalOrPrivateTabs
+import mozilla.components.browser.state.selector.selectedTab
 import mozilla.components.browser.state.store.BrowserStore
 import mozilla.components.compose.browser.toolbar.store.BrowserEditToolbarAction
 import mozilla.components.compose.browser.toolbar.store.BrowserToolbarStore
@@ -304,8 +306,8 @@ class FenixSearchMiddleware(
                 openToBrowserAndLoad(
                     url = url,
                     createNewTab =
-                        if (settings.enableHomepageAsNewTab) {
-                            false
+                        if (settings.openInSameTab) {
+                            true
                         } else {
                             store.state.tabId == null
                         },
@@ -332,8 +334,8 @@ class FenixSearchMiddleware(
                 openToBrowserAndLoad(
                     url = searchTerms,
                     createNewTab =
-                        if (settings.enableHomepageAsNewTab) {
-                            false
+                        if (settings.openInSameTab) {
+                            true
                         } else {
                             store.state.tabId == null
                         },
@@ -381,6 +383,13 @@ class FenixSearchMiddleware(
         searchEngine: SearchEngine? = null,
         flags: LoadUrlFlags = LoadUrlFlags.none(),
     ) {
+        if (settings.openInSameTab) {
+            val tabs = browserStore.state.getNormalOrPrivateTabs(private = usePrivateMode)
+            val targetTab = browserStore.state.selectedTab?.takeIf { it.content.private == usePrivateMode } ?: tabs.firstOrNull()
+            if (targetTab != null) {
+                useCases.tabsUseCases.removeTab.invoke(targetTab.id)
+            }
+        }
         navController.navigate(R.id.browserFragment)
         useCases.fenixBrowserUseCases.loadUrlOrSearch(
             searchTermOrURL = url,

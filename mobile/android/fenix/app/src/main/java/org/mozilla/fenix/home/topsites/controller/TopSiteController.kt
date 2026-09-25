@@ -28,6 +28,8 @@ import mozilla.components.browser.state.search.SearchEngine
 import mozilla.components.browser.state.state.availableSearchEngines
 import mozilla.components.browser.state.state.searchEngines
 import mozilla.components.browser.state.state.selectedOrDefaultSearchEngine
+import mozilla.components.browser.state.selector.getNormalOrPrivateTabs
+import mozilla.components.browser.state.selector.selectedTab
 import mozilla.components.browser.state.store.BrowserStore
 import mozilla.components.feature.tabs.TabsUseCases
 import mozilla.components.feature.top.sites.TopSite
@@ -381,18 +383,27 @@ class DefaultTopSiteController(
                 )
             }
 
-        if (settings.enableHomepageAsNewTab) {
-            fenixBrowserUseCases.loadUrlOrSearch(
-                searchTermOrURL = appendSearchAttributionToUrlIfNeeded(topSite.url),
-                newTab = false,
-                private = false,
+        val isPrivate = appStore.state.mode.isPrivate
+        val tabs = store.state.getNormalOrPrivateTabs(private = isPrivate)
+
+        if (settings.openInSameTab) {
+            val targetTab = store.state.selectedTab?.takeIf { it.content.private == isPrivate } ?: tabs.firstOrNull()
+            if (targetTab != null) {
+                activity.components.useCases.tabsUseCases.removeTab.invoke(targetTab.id)
+            }
+            TopSites.openInNewTab.record(TopSites.OpenInNewTabExtra(source = source.sourceName))
+            addTabUseCase.invoke(
+                url = appendSearchAttributionToUrlIfNeeded(topSite.url),
+                selectTab = true,
+                startLoading = true,
+                private = isPrivate,
             )
         } else {
             val existingTabForUrl =
                 when (topSite) {
                     is TopSite.Frecent,
                     is TopSite.Pinned -> {
-                        store.state.tabs.firstOrNull { topSite.url == it.content.url }
+                        tabs.firstOrNull { topSite.url == it.content.url }
                     }
 
                     else -> null
@@ -405,6 +416,7 @@ class DefaultTopSiteController(
                     url = appendSearchAttributionToUrlIfNeeded(topSite.url),
                     selectTab = true,
                     startLoading = true,
+                    private = isPrivate,
                 )
             } else {
                 selectTabUseCase.invoke(existingTabForUrl.id)

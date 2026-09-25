@@ -176,6 +176,13 @@ class Settings(
 
     override val preferences: SharedPreferences = appContext.getSharedPreferences(FENIX_PREFERENCES, MODE_PRIVATE)
 
+    init {
+        val legacyKey = appContext.getPreferenceKey(R.string.pref_key_enable_homepage_as_new_tab)
+        if (preferences.contains(legacyKey)) {
+            preferences.edit { remove(legacyKey) }
+        }
+    }
+
     /** Indicates if the recent saved bookmarks functionality should be visible. */
     var showBookmarksHomeFeature by
         booleanPreference(
@@ -2560,6 +2567,13 @@ class Settings(
     var enableHomepageAsNewTab by
         booleanPreference(
             key = appContext.getPreferenceKey(R.string.pref_key_enable_homepage_as_new_tab),
+            default = { FxNimbus.features.homepageAsNewTab.value().enabled },
+        )
+
+    /** Whether URLs and shortcuts clicked on the homepage open in the existing active tab instead of creating a new tab. */
+    var openInSameTab by
+        booleanPreference(
+            key = appContext.getPreferenceKey(R.string.pref_key_open_in_same_tab),
             default = true,
         )
 

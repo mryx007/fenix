@@ -259,7 +259,7 @@ class BrowserToolbarMiddleware(
         store: Store<BrowserToolbarState, BrowserToolbarAction>,
         browsingMode: BrowsingMode,
     ) {
-        if (settings.enableHomepageAsNewTab) {
+        if (settings.openInSameTab || settings.enableHomepageAsNewTab) {
             fenixBrowserUseCases.addNewHomepageTab(private = browsingMode.isPrivate)
             browsingModeManager.mode = browsingMode
         } else {

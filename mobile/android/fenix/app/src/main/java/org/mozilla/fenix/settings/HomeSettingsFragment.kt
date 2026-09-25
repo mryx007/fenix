@@ -107,11 +107,11 @@ class HomeSettingsFragment : PreferenceFragmentCompat(), SystemInsetsPaddedFragm
             }
         }
 
-        findPreference<SwitchPreferenceCompat>(getString(R.string.pref_key_enable_homepage_as_new_tab))?.apply {
-            isChecked = fenixSettings.enableHomepageAsNewTab
+        findPreference<SwitchPreferenceCompat>(getString(R.string.pref_key_open_in_same_tab))?.apply {
+            isChecked = fenixSettings.openInSameTab
             onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
                 val enabled = newValue as? Boolean ?: return@OnPreferenceChangeListener false
-                fenixSettings.enableHomepageAsNewTab = enabled
+                fenixSettings.openInSameTab = enabled
                 true
             }
         }

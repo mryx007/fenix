@@ -30,6 +30,8 @@ import mozilla.components.browser.state.search.SearchEngine
 import mozilla.components.browser.state.search.SearchEngine.Type.APPLICATION
 import mozilla.components.browser.state.search.SearchEngine.Type.CUSTOM
 import mozilla.components.browser.state.selector.findTab
+import mozilla.components.browser.state.selector.getNormalOrPrivateTabs
+import mozilla.components.browser.state.selector.selectedTab
 import mozilla.components.browser.state.state.selectedOrDefaultSearchEngine
 import mozilla.components.browser.state.store.BrowserStore
 import mozilla.components.browser.toolbar.R as toolbarR
@@ -342,9 +344,20 @@ class BrowserToolbarSearchMiddleware(
                 browserStore.state.search
                     .selectedOrDefaultSearchEngine(private = browsingModeManager.mode.isPrivate)
                     ?.id)
+        val isPrivate = browsingModeManager.mode.isPrivate
+        val hasTabs = browserStore.state.getNormalOrPrivateTabs(private = isPrivate).isNotEmpty()
+
+        if (settings.openInSameTab && hasTabs) {
+            val tabs = browserStore.state.getNormalOrPrivateTabs(private = isPrivate)
+            val targetTab = browserStore.state.selectedTab?.takeIf { it.content.private == isPrivate } ?: tabs.firstOrNull()
+            if (targetTab != null) {
+                components.useCases.tabsUseCases.removeTab.invoke(targetTab.id)
+            }
+        }
+
         val newTab =
-            if (settings.enableHomepageAsNewTab) {
-                false
+            if (settings.openInSameTab) {
+                true
             } else {
                 // Create a new tab if the source for where the search originated is not available.
                 appStore.state.searchState.sourceTabId?.run {
