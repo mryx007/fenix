@@ -6,14 +6,14 @@ A customized, lightweight Android browser based on Firefox for Android, tailored
 
 ## Features
 
-- **Single-Tab Navigation & Home-Integration:**
-  - Shortcuts und Suchen auf der Startseite nutzen standardmäßig den aktiven Tab weiter, anstatt für jeden Klick einen neuen Tab zu erzeugen. Neue Tabs entstehen wie bei Chrome gezielt über das `+` in der Tab-Übersicht.
-  - Zurücktaste und Home-Button navigieren den Tab zurück auf `about:home`, wodurch Webseiten im Hintergrund sauber entladen werden und kein visuelles Aufblitzen beim Laden anderer Shortcuts entsteht.
-  - **Dynamischer Vorwärts-Button auf dem Homescreen:** Kehrt man von einer Seite zur Startseite zurück, wird der Vorwärts-Button aktiv und bringt einen ohne Neuladen (aus dem BFCache) sofort wieder auf die Seite.
-  - **Home-Button auf dem Homescreen:** Ein Klick auf das Home-Symbol auf der Startseite aktiviert direkt die Adressleiste und öffnet die Tastatur.
-- **Firefox-Vorschläge Priorisierung:** Firefox-Vorschläge (Chronik, Lesezeichen, offene Tabs) werden standardmäßig vor den Suchmaschinen-Vorschlägen (z. B. Google-Suche) in der Adressleiste platziert. Anpassbar über *Einstellungen → Suche* (Standard: aktiviert).
-- **Home-Button Long-Press:** Längerer Druck auf das Home-Symbol in der Navigationsleiste aktiviert sofort die Adressleiste und öffnet die Tastatur.
-- **Download-Badge Deaktivierbar:** Der Benachrichtigungspunkt am Download- und Menü-Symbol nach Downloads kann in den Einstellungen flexibel ein- und ausgeschaltet werden (Standard: aus).
+- **Single-Tab Navigation & Homepage Integration:**
+  - Shortcuts and searches on the homepage reuse the active tab instead of creating a new tab every time. New tabs are only created intentionally via the `+` button in the tabs tray (Chrome-like behavior).
+  - Tapping the Home button or pressing Back on the root web page navigates the tab back to `about:home`, cleanly unloading the web page in the background and eliminating visual flashing when launching other shortcuts.
+  - **Dynamic Forward Button on Homepage:** When returning from a web page back to the homepage, the forward button in the toolbar is automatically enabled, returning you immediately to the page without reloading (served from BFCache).
+  - **Homepage Home Button Action:** Tapping the Home button while on the homepage immediately focuses the address bar and opens the keyboard.
+- **Prioritize Firefox Suggestions:** Firefox suggestions (history, bookmarks, open tabs) are placed above search engine suggestions (e.g. Google Search) by default in the address bar. Configurable in *Settings → Search* (Default: enabled).
+- **Home Button Long-Press:** Long-pressing the Home icon in the navigation toolbar on web pages instantly focuses the address bar and opens the keyboard.
+- **Configurable Download Badge:** The notification dot on the download and menu icons after completed downloads can be toggled on/off in settings (Default: disabled).
 - **Added Configurable In-App Updater:** Background update checks can be toggled on/off with customizable check intervals (1–24 hours) and effortless one-tap installation prompt.
 - **Added Shortcut Customization:** Preference sliders for shortcut icon size (32–72 dp), spacing (0–40 dp), and font size (8–16 sp) with dynamic width adaptation to prevent unwanted word wrapping.
 - **Expanded Homepage Shortcuts:** Displays up to 16 shortcuts on the homepage (4 per row) with left-aligned incomplete rows and intelligent "Show all" visibility.
@@ -28,21 +28,21 @@ A customized, lightweight Android browser based on Firefox for Android, tailored
 ## Changelog
 
 ### Latest Changes
-- **Single-Tab Navigation & Nahtlose Startseiten-Integration:**
-  - Shortcuts und Suchen auf der Startseite nutzen automatisch den aktiven Tab weiter, anstatt unnötig neue Tabs zu öffnen (wie bei Chrome entstehen neue Tabs nur noch über `+` im Tab-Manager).
-  - Beim Klick auf das Home-Symbol sowie bei der Zurücktaste auf der letzten Webseite navigiert der Tab zu `about:home`. Webseiten werden im Hintergrund entladen, was das Aufblitzen alter Inhalte verhindert.
-  - **Vorwärts-Button auf dem Homescreen:** Erkennt den Seitenverlauf und bringt den Nutzer per Klick sofort und ohne Neuladen (BFCache) wieder auf die zuvor geöffnete Webseite.
-  - **Home-Button auf dem Homescreen:** Aktiviert direkt die Adressleiste und öffnet die Bildschirmtastatur.
-- **Firefox-Vorschläge zuerst anzeigen:**
-  - Schalter „Firefox-Vorschläge zuerst anzeigen“ in *Einstellungen → Suche* integriert (standardmäßig aktiviert).
-  - Zeigt lokale Chronik, Lesezeichen, offene Tabs und FxSuggest oberhalb der Websuche-Vorschläge (z. B. Google-Suche) in der Adressleiste an.
-- **Home-Button Schnellzugriff:**
-  - Längerer Druck auf das Home-Symbol in der Navigationsleiste auf Webseiten aktiviert direkt die Adresszeile und öffnet die Tastatur.
-- **Download-Badge Einstellung:**
-  - Schalter „Download-Badge anzeigen“ in *Einstellungen → Downloads* ergänzt (standardmäßig deaktiviert).
-  - Unterdrückt den Benachrichtigungspunkt am Download-Symbol im Menü sowie am 3-Punkte-Menü in der Symbolleiste.
-- **Update-Prüfung & GitHub Actions Fix:**
-  - `versionName` und Release-Tag im Build-Workflow synchronisiert, sodass keine fehlerhaften Update-Meldungen mehr in Endlosschleife erscheinen.
+- **Single-Tab Navigation & Seamless Homepage Integration:**
+  - Shortcuts and searches on the homepage automatically reuse the active tab instead of cluttering the tab tray with new tabs.
+  - Tapping the Home icon or pressing the navbar Back button on the initial page navigates the tab back to `about:home`. Pages are unloaded in the background to prevent flashing old content.
+  - **Forward Button on Homepage:** Detects page history and instantly returns to the previously opened web page from BFCache without reloading.
+  - **Home Button on Homepage:** Tapping the Home button on the homepage focuses the address bar and brings up the on-screen keyboard.
+- **Show Firefox Suggestions First:**
+  - Added a "Show Firefox suggestions first" switch in *Settings → Search* (enabled by default).
+  - Displays local history, bookmarks, open tabs, and FxSuggest above web search suggestions (e.g., Google Search) in the awesomebar.
+- **Home Button Quick Access:**
+  - Long-pressing the Home icon in the navigation bar on web pages immediately focuses the address bar and opens the keyboard.
+- **Download Badge Setting:**
+  - Added a "Show download badge" toggle in *Settings → Downloads* (disabled by default).
+  - Suppresses the notification dot on the download icon in the menu and on the 3-dot toolbar menu.
+- **Update Checking & GitHub Actions Fix:**
+  - Synchronized `versionName` and release tags in the build workflow to prevent endless false-positive update notifications.
 - **Shortcuts Customization & Grid Layout:**
   - Added preference sliders in *Settings → Homepage → Shortcuts* for Icon Size, Spacing, and Font Size.
   - Dynamically scaled label containers and row layouts so multi-word shortcut titles don't wrap awkwardly.
