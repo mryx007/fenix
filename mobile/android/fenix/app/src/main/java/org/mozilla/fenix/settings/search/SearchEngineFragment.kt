@@ -113,6 +113,11 @@ class SearchEngineFragment : PreferenceFragmentCompat(), SystemInsetsPaddedFragm
                 isEnabled = context.components.settings.shouldShowSearchSuggestions
             }
 
+        val prioritizeFirefoxSuggestions =
+            requirePreference<SwitchPreferenceCompat>(R.string.pref_key_prioritize_firefox_suggestions).apply {
+                isChecked = context.components.settings.prioritizeFirefoxSuggestions
+            }
+
         val showHistorySuggestions =
             requirePreference<SwitchPreferenceCompat>(R.string.pref_key_search_browsing_history).apply {
                 isChecked = context.components.settings.shouldShowHistorySuggestions
@@ -166,6 +171,7 @@ class SearchEngineFragment : PreferenceFragmentCompat(), SystemInsetsPaddedFragm
                 }
             }
         searchSuggestionsPreference.onPreferenceChangeListener = SharedPreferenceUpdater()
+        prioritizeFirefoxSuggestions.onPreferenceChangeListener = SharedPreferenceUpdater()
         showHistorySuggestions.onPreferenceChangeListener = SharedPreferenceUpdater()
         showBookmarkSuggestions.onPreferenceChangeListener = SharedPreferenceUpdater()
         showSyncedTabsSuggestions.onPreferenceChangeListener = SharedPreferenceUpdater()

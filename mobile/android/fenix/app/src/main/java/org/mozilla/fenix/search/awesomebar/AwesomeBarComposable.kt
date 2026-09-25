@@ -210,6 +210,7 @@ class AwesomeBarComposable(
                         providers = state.searchSuggestionsProviders,
                         hiddenSuggestions = state.hiddenSuggestions,
                         orientation = orientation,
+                        prioritizeLocalSuggestions = components.settings.prioritizeFirefoxSuggestions,
                         onSuggestionClicked = { suggestion ->
                             searchStore.dispatch(SuggestionClicked(suggestion))
                         },

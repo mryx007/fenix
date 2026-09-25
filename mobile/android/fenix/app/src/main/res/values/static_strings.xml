@@ -28,6 +28,8 @@
     <string name="preferences_show_download_badge_summary" translatable="false">Zeigt einen Benachrichtigungspunkt am Download-Symbol an</string>
     <string name="preferences_enable_homepage_as_new_tab" translatable="false">Links und Verknüpfungen im selben Tab öffnen</string>
     <string name="preferences_enable_homepage_as_new_tab_summary" translatable="false">URLs und Verknüpfungen von der Startseite im aktuellen Tab statt in einem neuen Tab öffnen</string>
+    <string name="preferences_prioritize_firefox_suggestions" translatable="false">Firefox-Vorschläge zuerst anzeigen</string>
+    <string name="preferences_prioritize_firefox_suggestions_summary" translatable="false">Zeigt Chronik und Lesezeichen oberhalb der Suchmaschinen-Vorschläge an</string>
 
 
     <!-- Preference for developers -->

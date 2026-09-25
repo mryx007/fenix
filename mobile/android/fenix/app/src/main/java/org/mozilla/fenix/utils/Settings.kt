@@ -933,6 +933,12 @@ class Settings(
             default = 1f,
         )
 
+    var prioritizeFirefoxSuggestions by
+        booleanPreference(
+            appContext.getPreferenceKey(R.string.pref_key_prioritize_firefox_suggestions),
+            default = true,
+        )
+
     val shouldShowHistorySuggestions by
         booleanPreference(
             appContext.getPreferenceKey(R.string.pref_key_search_browsing_history),

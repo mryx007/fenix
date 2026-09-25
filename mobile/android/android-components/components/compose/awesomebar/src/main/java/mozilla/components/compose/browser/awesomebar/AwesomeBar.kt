@@ -42,6 +42,7 @@ fun AwesomeBar(
     providers: List<AwesomeBar.SuggestionProvider>,
     hiddenSuggestions: Set<GroupedSuggestion> = emptySet(),
     orientation: AwesomeBarOrientation = AwesomeBarOrientation.TOP,
+    prioritizeLocalSuggestions: Boolean = false,
     onSuggestionClicked: (AwesomeBar.SuggestionItem) -> Unit,
     onAutoComplete: (AwesomeBar.Suggestion) -> Unit,
     onRemoveClicked: (GroupedSuggestion) -> Unit,
@@ -68,6 +69,7 @@ fun AwesomeBar(
         groups = groups,
         hiddenSuggestions = hiddenSuggestions,
         orientation = orientation,
+        prioritizeLocalSuggestions = prioritizeLocalSuggestions,
         onSuggestionClicked = { _, suggestion -> onSuggestionClicked(suggestion) },
         onAutoComplete = { _, suggestion -> onAutoComplete(suggestion) },
         onRemoveClicked = { group, suggestion -> onRemoveClicked(GroupedSuggestion(suggestion, group.id)) },
@@ -97,6 +99,7 @@ fun AwesomeBar(
     groups: List<AwesomeBar.SuggestionProviderGroup>,
     hiddenSuggestions: Set<GroupedSuggestion> = emptySet(),
     orientation: AwesomeBarOrientation = AwesomeBarOrientation.TOP,
+    prioritizeLocalSuggestions: Boolean = false,
     onSuggestionClicked: (AwesomeBar.SuggestionProviderGroup, AwesomeBar.SuggestionItem) -> Unit,
     onAutoComplete: (AwesomeBar.SuggestionProviderGroup, AwesomeBar.Suggestion) -> Unit,
     onRemoveClicked: (AwesomeBar.SuggestionProviderGroup, AwesomeBar.Suggestion) -> Unit,
@@ -117,17 +120,27 @@ fun AwesomeBar(
         val fetcher = remember(groups) { SuggestionFetcher(groups, profiler) }
 
         val suggestions by
-            remember(fetcher.state.value, hiddenSuggestions) {
+            remember(fetcher.state.value, hiddenSuggestions, prioritizeLocalSuggestions) {
                 derivedStateOf {
                     val currentSuggestions = fetcher.state.value
 
+                    val comparator = if (prioritizeLocalSuggestions) {
+                        compareByDescending<AwesomeBar.SuggestionProviderGroup> { group ->
+                            val isSearch = group.providers.any {
+                                val name = it.javaClass.simpleName
+                                name.startsWith("Search") || name.startsWith("Trending")
+                            }
+                            if (isSearch) 0 else 1
+                        }.thenByDescending { it.priority }
+                            .thenBy { it.id }
+                    } else {
+                        compareByDescending<AwesomeBar.SuggestionProviderGroup> { it.priority }
+                            .thenBy { it.id }
+                    }
+
                     // Simple scenario: No pending soft deletion -> no need to filter suggestions.
                     if (hiddenSuggestions.isEmpty()) {
-                        return@derivedStateOf currentSuggestions.toSortedMap(
-                            compareByDescending<AwesomeBar.SuggestionProviderGroup> { it.priority }
-                                // Also using the ID avoids eliding results from groups with the same priority.
-                                .thenBy { it.id }
-                        )
+                        return@derivedStateOf currentSuggestions.toSortedMap(comparator)
                     }
 
                     // Complex scenario: Suggestions set for deletion -> need to avoid showing them in the meantime.
@@ -139,11 +152,7 @@ fun AwesomeBar(
                         }
                         // Remove any groups that become empty after filtering hidden suggestions.
                         .filterValues { it.isNotEmpty() }
-                        .toSortedMap(
-                            compareByDescending<AwesomeBar.SuggestionProviderGroup> { it.priority }
-                                // Also using the ID avoids eliding results from groups with the same priority.
-                                .thenBy { it.id }
-                        )
+                        .toSortedMap(comparator)
                 }
             }
 

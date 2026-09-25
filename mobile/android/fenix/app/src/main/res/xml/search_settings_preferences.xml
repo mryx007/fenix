@@ -69,6 +69,12 @@
          <SwitchPreferenceCompat
             app:iconSpaceReserved="false"
             android:defaultValue="true"
+            android:key="@string/pref_key_prioritize_firefox_suggestions"
+            android:title="@string/preferences_prioritize_firefox_suggestions"
+            android:summary="@string/preferences_prioritize_firefox_suggestions_summary" />
+         <SwitchPreferenceCompat
+            app:iconSpaceReserved="false"
+            android:defaultValue="true"
             android:key="@string/pref_key_search_browsing_history"
             android:title='@string/preferences_search_browsing_history' />
         <SwitchPreferenceCompat
