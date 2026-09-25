@@ -110,6 +110,7 @@ import org.mozilla.fenix.components.appstate.AppAction.SearchAction.SearchEnded
 import org.mozilla.fenix.components.appstate.AppAction.SearchAction.SearchStarted
 import org.mozilla.fenix.components.appstate.AppAction.SnackbarAction.SnackbarDismissed
 import org.mozilla.fenix.components.appstate.AppAction.URLCopiedToClipboard
+import org.mozilla.fenix.components.appstate.SupportedMenuNotifications
 import org.mozilla.fenix.components.appstate.SupportedMenuNotifications.NotDefaultBrowser
 import org.mozilla.fenix.components.appstate.snackbar.SnackbarState
 import org.mozilla.fenix.components.menu.MenuAccessPoint
@@ -970,7 +971,11 @@ class BrowserToolbarMiddleware(
 
     private fun observeMenuHighlightChanges(store: Store<BrowserToolbarState, BrowserToolbarAction>) {
         appStore.observeWhileActive {
-            distinctUntilChangedBy { it.supportedMenuNotifications.isNotEmpty() }
+            distinctUntilChangedBy { state ->
+                state.supportedMenuNotifications.filterNot {
+                    it == NotDefaultBrowser || (!settings.showDownloadBadge && it == SupportedMenuNotifications.Downloads)
+                }.isNotEmpty()
+            }
                 .collect {
                     updateEndBrowserActions(store)
                     updateNavigationActions(store)
@@ -1256,7 +1261,9 @@ class BrowserToolbarMiddleware(
                     drawableResId = iconsR.drawable.mozac_ic_ellipsis_vertical_24,
                     contentDescription = R.string.content_description_menu,
                     highlighted =
-                        appStore.state.supportedMenuNotifications.filterNot { it == NotDefaultBrowser }.isNotEmpty(),
+                        appStore.state.supportedMenuNotifications.filterNot {
+                            it == NotDefaultBrowser || (!settings.showDownloadBadge && it == SupportedMenuNotifications.Downloads)
+                        }.isNotEmpty(),
                     onClick = MenuClicked(source),
                 )
 

@@ -490,7 +490,12 @@ class BrowserToolbarMiddleware(
 
     private fun updateMenuHighlight(store: Store<BrowserToolbarState, BrowserToolbarAction>) {
         appStore.observeWhileActive {
-            distinctUntilChangedBy { it.supportedMenuNotifications.isNotEmpty() }
+            distinctUntilChangedBy { state ->
+                state.supportedMenuNotifications
+                    .filterNot { it is SupportedMenuNotifications.Summarize }
+                    .filterNot { !settings.showDownloadBadge && it == SupportedMenuNotifications.Downloads }
+                    .any { it != SupportedMenuNotifications.OpenInApp }
+            }
                 .collect {
                     updateEndBrowserActions(store)
                     updateNavigationActions(store)
@@ -570,6 +575,7 @@ class BrowserToolbarMiddleware(
                 val highlighted =
                     appStore.state.supportedMenuNotifications
                         .filterNot { it is SupportedMenuNotifications.Summarize }
+                        .filterNot { !settings.showDownloadBadge && it == SupportedMenuNotifications.Downloads }
                         .any { it != SupportedMenuNotifications.OpenInApp }
                 ActionButtonRes(
                     drawableResId = iconsR.drawable.mozac_ic_ellipsis_vertical_24,

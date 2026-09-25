@@ -38,4 +38,12 @@
         android:title="@string/preferences_choose_app_for_downloads"
         app:iconSpaceReserved="false"
         app:allowDividerAbove="true" />
+
+    <SwitchPreferenceCompat
+        android:defaultValue="false"
+        android:key="@string/pref_key_show_download_badge"
+        android:title="@string/preferences_show_download_badge"
+        android:summary="@string/preferences_show_download_badge_summary"
+        app:iconSpaceReserved="false"
+        app:allowDividerAbove="true" />
 </androidx.preference.PreferenceScreen>

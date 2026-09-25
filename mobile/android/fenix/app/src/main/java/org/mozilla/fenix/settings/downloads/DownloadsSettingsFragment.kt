@@ -17,6 +17,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.SwitchPreferenceCompat
 import mozilla.components.support.base.log.logger.Logger
 import mozilla.components.support.ktx.kotlin.ifNullOrEmpty
 import org.mozilla.fenix.R
@@ -92,6 +93,15 @@ class DownloadsSettingsFragment : PreferenceFragmentCompat(), SystemInsetsPadded
         val fileStorageCategory =
             findPreference<PreferenceCategory>(getString(R.string.pref_key_downloads_storage_category))
         fileStorageCategory?.isVisible = FxNimbus.features.downloadsCustomLocation.value().enabled
+
+        findPreference<SwitchPreferenceCompat>(getString(R.string.pref_key_show_download_badge))?.apply {
+            isChecked = requireComponents.settings.showDownloadBadge
+            onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
+                val enabled = newValue as? Boolean ?: return@OnPreferenceChangeListener false
+                requireComponents.settings.showDownloadBadge = enabled
+                true
+            }
+        }
     }
 
     private fun setUpDeleteBehaviorPreference() {

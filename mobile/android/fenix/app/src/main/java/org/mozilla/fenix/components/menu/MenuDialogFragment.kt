@@ -520,9 +520,10 @@ class MenuDialogFragment : BottomSheetDialogFragment() {
 
                                     val isDownloadHighlighted by remember {
                                         appStore.stateFlow.map { state ->
-                                            state.supportedMenuNotifications.contains(
-                                                SupportedMenuNotifications.Downloads
-                                            )
+                                            settings.showDownloadBadge &&
+                                                state.supportedMenuNotifications.contains(
+                                                    SupportedMenuNotifications.Downloads
+                                                )
                                         }
                                     }
                                         .collectAsState(initial = false)

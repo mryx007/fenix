@@ -24,6 +24,11 @@
     <string name="pref_key_top_sites_font_size" translatable="false">pref_key_top_sites_font_size</string>
     <string name="preferences_top_sites_font_size" translatable="false">Shortcut-Schriftgröße</string>
     <string name="preferences_top_sites_font_size_summary" translatable="false">Schriftgröße der Beschriftungen (8 bis 16 sp)</string>
+    <string name="preferences_show_download_badge" translatable="false">Download-Badge anzeigen</string>
+    <string name="preferences_show_download_badge_summary" translatable="false">Zeigt einen Benachrichtigungspunkt am Download-Symbol an</string>
+    <string name="preferences_enable_homepage_as_new_tab" translatable="false">Links und Verknüpfungen im selben Tab öffnen</string>
+    <string name="preferences_enable_homepage_as_new_tab_summary" translatable="false">URLs und Verknüpfungen von der Startseite im aktuellen Tab statt in einem neuen Tab öffnen</string>
+
 
     <!-- Preference for developers -->
     <string name="preference_leakcanary" translatable="false">LeakCanary</string>

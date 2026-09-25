@@ -50,6 +50,7 @@ import mozilla.components.ui.icons.R as iconsR
 import org.mozilla.fenix.R
 import org.mozilla.fenix.browser.browsingmode.BrowsingMode.Normal
 import org.mozilla.fenix.browser.browsingmode.BrowsingMode.Private
+import org.mozilla.fenix.components.appstate.SupportedMenuNotifications
 import org.mozilla.fenix.components.toolbar.ToolbarPosition
 import org.mozilla.fenix.databinding.TabPreviewBinding
 import org.mozilla.fenix.ext.components
@@ -166,7 +167,10 @@ constructor(
                 ActionButtonRes(
                     drawableResId = iconsR.drawable.mozac_ic_ellipsis_vertical_24,
                     contentDescription = R.string.content_description_menu,
-                    highlighted = context.components.appStore.state.supportedMenuNotifications.isNotEmpty(),
+                    highlighted =
+                        context.components.appStore.state.supportedMenuNotifications.filterNot {
+                            !context.components.settings.showDownloadBadge && it == SupportedMenuNotifications.Downloads
+                        }.isNotEmpty(),
                     onClick = object : BrowserToolbarEvent {},
                 )
 

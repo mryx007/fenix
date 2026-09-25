@@ -107,6 +107,15 @@ class HomeSettingsFragment : PreferenceFragmentCompat(), SystemInsetsPaddedFragm
             }
         }
 
+        findPreference<SwitchPreferenceCompat>(getString(R.string.pref_key_enable_homepage_as_new_tab))?.apply {
+            isChecked = fenixSettings.enableHomepageAsNewTab
+            onPreferenceChangeListener = Preference.OnPreferenceChangeListener { _, newValue ->
+                val enabled = newValue as? Boolean ?: return@OnPreferenceChangeListener false
+                fenixSettings.enableHomepageAsNewTab = enabled
+                true
+            }
+        }
+
         requirePreference<SwitchPreferenceCompat>(R.string.pref_key_privacy_report).apply {
             if (fenixSettings.longfoxEnabled) title = resources.getString(R.string.help_catch_trackers)
             isChecked = fenixSettings.showPrivacyReportFeature

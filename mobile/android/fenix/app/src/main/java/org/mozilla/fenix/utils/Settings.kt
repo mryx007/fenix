@@ -2554,7 +2554,7 @@ class Settings(
     var enableHomepageAsNewTab by
         booleanPreference(
             key = appContext.getPreferenceKey(R.string.pref_key_enable_homepage_as_new_tab),
-            default = { FxNimbus.features.homepageAsNewTab.value().enabled },
+            default = true,
         )
 
     /** Whether the universal edge-to-edge wallpapers treatment is enabled. */
@@ -3345,6 +3345,13 @@ class Settings(
         stringPreference(
             appContext.getPreferenceKey(R.string.pref_key_downloads_default_location),
             default = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).path,
+        )
+
+    /** Whether to show a badge/dot on the download menu item and toolbar when a download finishes. */
+    var showDownloadBadge by
+        booleanPreference(
+            key = appContext.getPreferenceKey(R.string.pref_key_show_download_badge),
+            default = false,
         )
 
     /** Whether WebCompat Reporter enhancements is enabled. */
