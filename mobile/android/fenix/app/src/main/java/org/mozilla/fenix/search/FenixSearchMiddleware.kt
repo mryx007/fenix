@@ -19,9 +19,7 @@ import kotlinx.coroutines.launch
 import mozilla.components.browser.state.action.AwesomeBarAction
 import mozilla.components.browser.state.search.DefaultSearchEngineProvider
 import mozilla.components.browser.state.search.SearchEngine
-import mozilla.components.browser.state.selector.selectedTab
 import mozilla.components.browser.state.store.BrowserStore
-import mozilla.components.concept.engine.utils.ABOUT_HOME_URL
 import mozilla.components.compose.browser.toolbar.store.BrowserEditToolbarAction
 import mozilla.components.compose.browser.toolbar.store.BrowserToolbarStore
 import mozilla.components.compose.browser.toolbar.ui.BrowserToolbarQuery
@@ -306,7 +304,7 @@ class FenixSearchMiddleware(
                 openToBrowserAndLoad(
                     url = url,
                     createNewTab =
-                        if (settings.enableHomepageAsNewTab || browserStore.state.selectedTab?.content?.url == ABOUT_HOME_URL) {
+                        if (settings.enableHomepageAsNewTab) {
                             false
                         } else {
                             store.state.tabId == null
@@ -334,7 +332,7 @@ class FenixSearchMiddleware(
                 openToBrowserAndLoad(
                     url = searchTerms,
                     createNewTab =
-                        if (settings.enableHomepageAsNewTab || browserStore.state.selectedTab?.content?.url == ABOUT_HOME_URL) {
+                        if (settings.enableHomepageAsNewTab) {
                             false
                         } else {
                             store.state.tabId == null

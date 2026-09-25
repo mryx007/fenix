@@ -30,10 +30,8 @@ import mozilla.components.browser.state.search.SearchEngine
 import mozilla.components.browser.state.search.SearchEngine.Type.APPLICATION
 import mozilla.components.browser.state.search.SearchEngine.Type.CUSTOM
 import mozilla.components.browser.state.selector.findTab
-import mozilla.components.browser.state.selector.selectedTab
 import mozilla.components.browser.state.state.selectedOrDefaultSearchEngine
 import mozilla.components.browser.state.store.BrowserStore
-import mozilla.components.concept.engine.utils.ABOUT_HOME_URL
 import mozilla.components.browser.toolbar.R as toolbarR
 import mozilla.components.compose.browser.toolbar.BrowserToolbar
 import mozilla.components.compose.browser.toolbar.concept.Action
@@ -344,9 +342,8 @@ class BrowserToolbarSearchMiddleware(
                 browserStore.state.search
                     .selectedOrDefaultSearchEngine(private = browsingModeManager.mode.isPrivate)
                     ?.id)
-        val isHomepageTab = browserStore.state.selectedTab?.content?.url == ABOUT_HOME_URL
         val newTab =
-            if (settings.enableHomepageAsNewTab || isHomepageTab) {
+            if (settings.enableHomepageAsNewTab) {
                 false
             } else {
                 // Create a new tab if the source for where the search originated is not available.

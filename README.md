@@ -6,11 +6,6 @@ A customized, lightweight Android browser based on Firefox for Android, tailored
 
 ## Features
 
-- **Single-Tab Navigation & Homepage Integration:**
-  - Shortcuts and searches on the homepage reuse the active tab instead of creating a new tab every time. New tabs are only created intentionally via the `+` button in the tabs tray (Chrome-like behavior).
-  - Tapping the Home button or pressing Back on the root web page navigates the tab back to `about:home`, cleanly unloading the web page in the background and eliminating visual flashing when launching other shortcuts.
-  - **Dynamic Forward Button on Homepage:** When returning from a web page back to the homepage, the forward button in the toolbar is automatically enabled, returning you immediately to the page without reloading (served from BFCache).
-  - **Homepage Home Button Action:** Tapping the Home button while on the homepage immediately focuses the address bar and opens the keyboard.
 - **Prioritize Firefox Suggestions:** Firefox suggestions (history, bookmarks, open tabs) are placed above search engine suggestions (e.g. Google Search) by default in the address bar. Configurable in *Settings → Search* (Default: enabled).
 - **Home Button Long-Press:** Long-pressing the Home icon in the navigation toolbar on web pages instantly focuses the address bar and opens the keyboard.
 - **Configurable Download Badge:** The notification dot on the download and menu icons after completed downloads can be toggled on/off in settings (Default: disabled).
@@ -28,11 +23,6 @@ A customized, lightweight Android browser based on Firefox for Android, tailored
 ## Changelog
 
 ### Latest Changes
-- **Single-Tab Navigation & Seamless Homepage Integration:**
-  - Shortcuts and searches on the homepage automatically reuse the active tab instead of cluttering the tab tray with new tabs.
-  - Tapping the Home icon or pressing the navbar Back button on the initial page navigates the tab back to `about:home`. Pages are unloaded in the background to prevent flashing old content.
-  - **Forward Button on Homepage:** Detects page history and instantly returns to the previously opened web page from BFCache without reloading.
-  - **Home Button on Homepage:** Tapping the Home button on the homepage focuses the address bar and brings up the on-screen keyboard.
 - **Show Firefox Suggestions First:**
   - Added a "Show Firefox suggestions first" switch in *Settings → Search* (enabled by default).
   - Displays local history, bookmarks, open tabs, and FxSuggest above web search suggestions (e.g., Google Search) in the awesomebar.
